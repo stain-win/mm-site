@@ -1,0 +1,33 @@
+<div class="qrgen-container">
+  <div class="flex justify-center px-6 my-12">
+    <div class="qrgen-cols">
+      <!-- Col -->
+      <div class="qrgen-cols__svg">
+        <div class="p-8">
+          <svg id="qrcode-svg" class="mx-auto my-auto"
+               style="width:20em; height:20em; padding:1em; background-color:#E8E8E8">
+            <rect width="100%" height="100%" fill="#FFFFFF" stroke-width="0"></rect>
+            <path d="" fill="#101010" stroke-width="0"></path>
+          </svg>
+        </div>
+      </div>
+      <!-- Col -->
+      <div class="qrgen-cols__form">
+        <div class="qrgen-cols__form__info">
+          <h3>Need to create QR code?</h3>
+          <p>
+            Just enter string value in input and QR code will be created live!
+          </p>
+        </div>
+        <form [formGroup]="qrGenForm">
+          <div class="qrgen-cols__form__input">
+            <tui-input formControlName="qrCodeValue" class="b-form" id="qrcode">
+              Type something
+            </tui-input>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
