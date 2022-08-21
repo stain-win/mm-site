@@ -2,15 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-@import '~@taiga-ui/core/styles/taiga-ui-local';
-
+//@import '~@taiga-ui/core/styles/taiga-ui-local';
+body {
+  @apply bg-neutral-800
+}
 @layer components {
   mm-qrgen {
     @apply font-mono;
     .qrgen-container {
       @apply container mx-auto;
+      &__flex {
+        @apply flex justify-center md:px-6 md:my-12 sm:my-8 sm:px-3;
+      }
       .qrgen-cols {
-        @apply w-full xl:w-3/4 lg:w-11/12 flex;
+        @apply w-full xl:w-3/4 lg:w-11/12 flex sm:flex-col md:flex-row;
 
         &__svg {
           @apply w-full h-auto lg:block lg:w-1/2 bg-cover rounded-l-lg;
@@ -45,7 +50,7 @@
 
   mm-pages {
     .main-container {
-      @apply flex flex-col h-full w-full items-center justify-center container mx-auto px-8;
+      @apply flex flex-col w-full items-center justify-center mx-auto px-8 bg-cover bg-neutral-800;
 
       &__title {
         @apply max-w-2xl text-center;
