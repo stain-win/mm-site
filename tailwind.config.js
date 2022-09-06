@@ -11,7 +11,14 @@ module.exports = {
             lg: '976px',
             xl: '1440px',
         },
-        extend: {},
+        extend: {
+            fontFamily: {
+                'jost': ['"Jost"', 'sans-serif'],
+            },
+            letterSpacing: {
+                widest: '1em'
+            }
+        },
     },
     plugins: [],
 }

@@ -1,22 +1,16 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import {PagesComponent} from './pages.component';
-
+import { WebglComponent } from './webgl.component';
 
 const routes: Routes = [
     {
         path: '',
-        component: PagesComponent,
-    },
-    {
-        path: 'webgl',
-        loadChildren: () => import('./webgl/webgl.module').then(m => m.WebglModule),
+        component: WebglComponent,
     },
 ];
-
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class PagesRoutingModule {}
+export class WebglRoutingModule { }
