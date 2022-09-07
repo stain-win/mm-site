@@ -16,7 +16,8 @@ module.exports = {
                 'jost': ['"Jost"', 'sans-serif'],
             },
             letterSpacing: {
-                widest: '1em'
+                widest: '1em',
+                wider: '.7em'
             }
         },
     },

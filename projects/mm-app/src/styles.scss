@@ -71,14 +71,16 @@ body {
     @apply text-white;
 
     .webgl-container {
-      pointer-events: none;
+      //pointer-events: none;
       @apply absolute grid place-content-center w-full h-screen z-10;
       &__content {
         @apply flex gap-5 w-full relative;
         h1 {
-          @apply pt-4 mb-2 text-5xl tracking-widest font-bold mix-blend-screen;
+          @apply pb-2 pl-[0.7em] mb-2 text-6xl uppercase tracking-widest font-bold lg:tracking-wider;
         }
       }
+
+
 
     }
 

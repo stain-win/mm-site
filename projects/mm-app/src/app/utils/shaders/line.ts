@@ -14,8 +14,6 @@ uniform float uTime;
 
 varying vec3 vColor;
 
-
-//  the function below is hash12 from https://www.shadertoy.com/view/4djSRW - I just renamed it nrand()
 float hash11(float p)
 {
     p = fract(p * .1031);
@@ -156,16 +154,17 @@ void main() {
     // float o4 = hash12( vec2(uRandom + aSeed.x, uRandomVec4.x) );
     // float o5 = hash12( vec2(uRandom + aSeed.x, uRandomVec4.w) );
 
+    // float o1 = hash12( vec2(uRandom + aSeed.w, uRandomVec4.x) );
+    // float o2 = hash12( vec2(uRandom + aSeed.w, uRandomVec4.x) );
+    // float o3 = hash12( vec2(uRandom + aSeed.z, uRandomVec4.x) );
+    // float o4 = hash12( vec2(uRandom + aSeed.x, uRandomVec4.x) );
+    // float o5 = hash12( vec2(uRandom + aSeed.y, uRandomVec4.w) );
+
     float o1 = hash12( vec2(uRandom + aSeed.x, uRandomVec4.x) );
     float o2 = hash12( vec2(uRandom + aSeed.y, uRandomVec4.y) );
     float o3 = hash12( vec2(uRandom + aSeed.z, uRandomVec4.z) );
     float o4 = hash12( vec2(uRandom + aSeed.w, uRandomVec4.w) );
     float o5 = hash12( vec2(uRandom + aSeed.w, uRandomVec4.w) );
-
-
-
-
-
 
     float t = o1;
     vec3 positiont = position * (1.0 - t) + position1 * t;

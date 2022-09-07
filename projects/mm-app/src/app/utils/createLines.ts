@@ -1,17 +1,16 @@
 import * as THREE from 'three';
+import {BufferGeometry} from 'three';
 import {curlNoise} from './curlNoise';
 
 const pointsPerFrame = 5000;
 const pointsPerLine  = 25;
-const minimumLineSize = 0.015;
-const drawCallsPerFrame = 10;
 
 
 // wether each line has assigned a quantity of points proportional to its length or a fixed number instead
 const useLengthSampling = false;
 
-export function createLines () {
-    const nrings = 31;
+export function createLines (): any[] {
+    const nrings = 32;
     const lines = [];
 
     for (let j = 0; j < nrings; j++) {
@@ -23,7 +22,8 @@ export function createLines () {
         const rad = p.y;
         const z   = p.z;
 
-        const trad = 5.75;
+        const trad = 5;
+        // const trad = 3.5;
 
         const nsegments = 70 + Math.abs(Math.floor(rad * 360));
         const noiseSpeed = Math.random();
@@ -42,8 +42,6 @@ export function createLines () {
             const x2 = Math.cos(a2) * rad * frad;
             const y2 = Math.sin(a2) * rad * frad;
             const z2 = z                  * frad;
-
-            // let noiseSpeed = 0.5;
 
             const noiseStrength1 =
                 0.1 + curlNoise(
@@ -77,7 +75,6 @@ export function createLines () {
             colorMult2 *= diffuse2;
             colorMult += 0.002;
             colorMult2 += 0.002;
-
 
             const t = 1;
 
@@ -133,7 +130,7 @@ export function createLines () {
     return lines;
 }
 
-export function createLinesGeometry (lines: string | any[]) {
+export function createLinesGeometry (lines: string | any[]): BufferGeometry {
 
     const geometry = new THREE.BufferGeometry();
     const position1 = [];
@@ -165,9 +162,6 @@ export function createLinesGeometry (lines: string | any[]) {
         accumulatedLinesLength += lineLength;
     }
     const pointsPerUnit = pointsPerFrame / accumulatedLinesLength;
-
-
-
 
     for (let j = 0; j < lines.length; j++) {
 
