@@ -3,7 +3,7 @@ import {Vector3} from 'three';
 
 const noise = createNoise3D();
 
-export function noise3( px: number, py: number, pz: number): Vector3 {
+export function noise3 ( px: number, py: number, pz: number): Vector3 {
     const rv = new Vector3();
 
     const x = noise(px, py, pz);
@@ -17,8 +17,7 @@ export function noise3( px: number, py: number, pz: number): Vector3 {
     return rv;
 }
 
-/* vec3 */
-export function curlNoise( /* vec3 */ p: Vector3): Vector3 {
+export function curlNoise ( p: Vector3): Vector3 {
     const e = 0.1;
 
     const dx = new Vector3(e, 0, 0);

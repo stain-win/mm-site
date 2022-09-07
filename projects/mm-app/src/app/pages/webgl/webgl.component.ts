@@ -1,4 +1,5 @@
-import {Component, ElementRef, NgZone, OnInit, Renderer2} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, NgZone, OnInit, Renderer2} from '@angular/core';
+import gsap from 'gsap';
 import { clamp, throttle } from 'lodash';
 import {
     AddEquation, Clock,
@@ -26,6 +27,7 @@ export const SIZES = {
     selector: 'mm-webgl',
     templateUrl: './webgl.component.html',
     styleUrls: ['./webgl.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WebglComponent implements OnInit {
     cameraFocalDistance = 49.19;
@@ -33,13 +35,14 @@ export class WebglComponent implements OnInit {
     cameraFocalDistanceMax = 60.55;
     bokehStrength = 0.06;
     samples = 1;
-    exposure = 0.0013;
+    exposure = 0.0012;
     rotationCoef = 0.016;
+    prevFrameTime = 0;
+
+    mouse = {x: 0, y: 0};
 
     dirVec = new Vector3(2, 2, 10).normalize().multiplyScalar(50);
-
     renderer = new WebGLRenderer({
-        alpha: true,
     });
     scene: Scene = new Scene();
     postProcScene: Scene = new Scene();
@@ -55,8 +58,8 @@ export class WebglComponent implements OnInit {
         vertexShader: linev,
         fragmentShader: linef,
         uniforms: {
-            uTime: { value: 0 },
-            uRandom: { value: 0 },
+            uTime: { value: 2 },
+            uRandom: { value: 3 },
             uRandomVec4: new Uniform(new Vector4(0, 0, 0, 0)),
             uFocalDepth: { value: this.cameraFocalDistance },
             uBokehStrength: { value: this.bokehStrength },
@@ -119,11 +122,29 @@ export class WebglComponent implements OnInit {
 
     ngOnInit (): void {
         this.renderer2.appendChild(this.el.nativeElement, this.renderer.domElement);
-        this.linesMesh.rotation.x = .2;
-        this.postProcMesh.rotation.x = .2;
 
         this.zone.runOutsideAngular(() => {
-            this.renderer.domElement.addEventListener('wheel', throttle((e: HTMLElementEventMap['wheel']) => {
+            const h1 = document.querySelector('h1');
+            const tl = gsap.timeline();
+            tl.from(h1, {
+                duration: 2,
+                opacity: 0,
+                ease: 'power2in',
+                delay: .5,
+            });
+
+            window.addEventListener('resize', () =>
+            {
+                const sizes = {width: window.innerWidth, height: window.innerHeight};
+                this._resetCanvas();
+                this.camera.aspect = sizes.width / sizes.height;
+                this.camera.updateProjectionMatrix();
+
+                // Update renderer
+                this.renderer.setSize(sizes.width, sizes.height);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            });
+            this.el.nativeElement.addEventListener('wheel', throttle((e: HTMLElementEventMap['wheel']) => {
                 this.cameraFocalDistance -= 0.3 * Math.sign(e.deltaY);
                 this.cameraFocalDistance = clamp(
                     this.cameraFocalDistance,
@@ -132,18 +153,25 @@ export class WebglComponent implements OnInit {
                 );
 
             }, 100));
-            this._render();
+            this.el.nativeElement.addEventListener('mousemove', throttle((e: HTMLElementEventMap['mousemove']) => {
+                this.mouse.x = e.clientX;
+                this.mouse.y = e.clientY;
+            }, 100));
+            setTimeout(this._render.bind(this), 0);
         });
     }
 
-    private _render (now= 0): void {
-        if (now % 2 < 1) {
+    private _render (now = 0): void {
+        const frameDelta = now - this.prevFrameTime;
+
+        if (frameDelta > 16.7) {
             this._resetCanvas();
+            this.prevFrameTime = now;
         }
         window.requestAnimationFrame(this._render.bind(this));
 
         const elapsedTime = this.clock.getElapsedTime();
-
+        this.linesMesh.rotation.y = 50;
         this.linesMesh.rotation.z = (this.rotationCoef * elapsedTime);
         this.postProcMesh.rotation.z = (this.rotationCoef * elapsedTime);
         this.controls.update();
