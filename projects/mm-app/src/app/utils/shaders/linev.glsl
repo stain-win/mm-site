@@ -1,4 +1,3 @@
-export const linev = `
 attribute vec3 position1;
 attribute vec3 color1;
 attribute vec3 color2;
@@ -179,7 +178,6 @@ void main() {
     float bokehStrength = distanceFromFocalPoint * uBokehStrength;
 	bokehStrength = max(bokehStrength, uMinimumLineSize);
 
-    // offset in random point along the sphere
     vec4 randNumbers = vec4( o2, o3, o4, o5 );
 
     float lambda = randNumbers.x;
@@ -196,28 +194,20 @@ void main() {
 
 	// two different functions for color attenuation if you need it
 
-	vColor = vec3(
-		vColor.r * exp(-distanceFromFocalPoint * 0.1),
-		vColor.g * exp(-distanceFromFocalPoint * 0.1),
-		vColor.b * exp(-distanceFromFocalPoint * 0.1)
-	);
+//	vColor = vec3(
+//		vColor.r * exp(-distanceFromFocalPoint * 0.1),
+//		vColor.g * exp(-distanceFromFocalPoint * 0.1),
+//		vColor.b * exp(-distanceFromFocalPoint * 0.1)
+//	);
 
-	// vColor = vec3(
-	// 	vColor.r / (1.0 + pow(distanceFromFocalPoint * 0.015, 2.71828)),
-	// 	vColor.g / (1.0 + pow(distanceFromFocalPoint * 0.015, 2.71828)),
-	// 	vColor.b / (1.0 + pow(distanceFromFocalPoint * 0.015, 2.71828))
-	// );
-
+	 vColor = vec3(
+	 	vColor.r / (1.0 + pow(distanceFromFocalPoint * 0.015, 2.71828)),
+	 	vColor.g / (1.0 + pow(distanceFromFocalPoint * 0.015, 2.71828)),
+	 	vColor.b / (.8 + pow(distanceFromFocalPoint * 0.015, 2.71828))
+	 );
 
     vec4 projectedPosition = projectionMatrix * modelViewMatrix * vec4(positiont, 1.0);
     gl_Position = projectedPosition;
 
     gl_PointSize = 1.0;
-}`;
-
-export const linef = `
-varying vec3 vColor;
-
-void main() {
-    gl_FragColor = vec4(vColor, 1.0);
-}`;
+}

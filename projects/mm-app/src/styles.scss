@@ -73,19 +73,43 @@ body {
     .webgl-container {
       //pointer-events: none;
       @apply absolute grid place-content-center w-full h-screen z-10;
-      &__content {
-        @apply flex gap-5 w-full relative;
-        h1 {
-          @apply pb-2 pl-[0.7em] mb-2 text-6xl uppercase tracking-widest font-bold lg:tracking-wider;
+      &__header {
+        @apply fixed top-10 left-0 h-16 px-5;
+      }
+      &__menu {
+        @apply uppercase fixed top-10 right-12;
+        span {
+          @apply mr-2.5 inline-block pb-1.5;
+          &:hover {
+            @apply border-b-2 border-white;
+          }
         }
+
+
+      }
+      &__footer {
+        @apply fixed bottom-0 left-0;
+      }
+      &__content {
+        @apply flex gap-5 w-full relative items-center md:flex-col;
+        h1 {
+          @apply pb-2 pl-[0.7em]
+          mb-2 uppercase tracking-widest lg:text-6xl
+          font-bold lg:tracking-wider lg:w-full md:w-1/2 md:text-5xl;
+        }
+      }
+      .square {
+        @apply h-10 w-1 bg-cyan-100 py-2 rounded-lg;
+      }
+      .scroll {
+        @apply absolute left-4 bottom-40 rotate-90 origin-bottom-left whitespace-nowrap;
+      }
+      .scroll-line {
+        @apply absolute left-6 bottom-72 rotate-90 origin-bottom-left bg-gray-300 h-[1px] w-28;
       }
 
 
-
     }
-
-
-
     canvas {
       pointer-events: auto;
       z-index: 0;
