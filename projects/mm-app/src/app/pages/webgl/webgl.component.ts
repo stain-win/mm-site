@@ -15,8 +15,10 @@ import {
 } from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import {createLines, createLinesGeometry} from '../../utils/createLines';
-import { linef, linev } from '../../utils/shaders/line';
-import {postprocf, postprocv } from '../../utils/shaders/postproc';
+import linef from '../../utils/shaders/linef.glsl';
+import linev from '../../utils/shaders/linev.glsl';
+import postprocf from '../../utils/shaders/postprocf.glsl';
+import postprocv from '../../utils/shaders/postprocv.glsl';
 
 export const SIZES = {
     width: window.innerWidth,
@@ -88,13 +90,11 @@ export class WebglComponent implements OnInit {
         vertexShader: postprocv,
         fragmentShader: postprocf,
         uniforms: {
-            // @ts-ignore
-            textureOffRT: { type: 't', value: this.offscreenRT.texture },
+            textureOffRT: { value: this.offscreenRT.texture },
             uSamples: { value: this.samples },
             uExposure: { value: this.exposure },
             uBackgroundColor: new Uniform(new Vector3(21 / 255, 16 / 255, 16 / 255)),
         },
-        side: DoubleSide,
     });
     postProcMesh = new Mesh(this.postProcQuadGeo, this.postProcQuadMaterial);
 
@@ -125,16 +125,27 @@ export class WebglComponent implements OnInit {
 
         this.zone.runOutsideAngular(() => {
             const h1 = document.querySelector('h1');
+            const scroll = document.querySelector('.scroll');
+            const menu = document.querySelector('.webgl-container__menu');
             const tl = gsap.timeline();
             tl.from(h1, {
-                duration: 2,
                 opacity: 0,
                 ease: 'power2in',
                 delay: .5,
+            }).from(menu, {
+                duration: 1,
+                opacity: 0,
+                ease: 'power2in',
+                delay: 0,
+            }).from(scroll, {
+                duration: 1,
+                opacity: 0,
+                bottom: 500,
+                ease: 'power2in',
+                delay: 0,
             });
 
-            window.addEventListener('resize', () =>
-            {
+            window.addEventListener('resize', () => {
                 const sizes = {width: window.innerWidth, height: window.innerHeight};
                 this._resetCanvas();
                 this.camera.aspect = sizes.width / sizes.height;
@@ -143,7 +154,8 @@ export class WebglComponent implements OnInit {
                 // Update renderer
                 this.renderer.setSize(sizes.width, sizes.height);
                 this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            });
+            }, {passive: true});
+
             this.el.nativeElement.addEventListener('wheel', throttle((e: HTMLElementEventMap['wheel']) => {
                 this.cameraFocalDistance -= 0.3 * Math.sign(e.deltaY);
                 this.cameraFocalDistance = clamp(
@@ -151,19 +163,17 @@ export class WebglComponent implements OnInit {
                     this.cameraFocalDistanceMin,
                     this.cameraFocalDistanceMax,
                 );
-
-            }, 100));
+            }, 100), {passive: true});
             this.el.nativeElement.addEventListener('mousemove', throttle((e: HTMLElementEventMap['mousemove']) => {
                 this.mouse.x = e.clientX;
                 this.mouse.y = e.clientY;
-            }, 100));
+            }, 100), {passive: true});
             setTimeout(this._render.bind(this), 0);
         });
     }
 
     private _render (now = 0): void {
         const frameDelta = now - this.prevFrameTime;
-
         if (frameDelta > 16.7) {
             this._resetCanvas();
             this.prevFrameTime = now;
