@@ -6,7 +6,7 @@ import {
     Color,
     CustomBlending,
     DoubleSide, FloatType, Mesh,
-    OneFactor, PerspectiveCamera, PlaneGeometry, Points,
+    OneFactor, PerspectiveCamera, PlaneGeometry, Points, PointsMaterial,
     Scene,
     ShaderMaterial,
     Uniform, Vector3,
@@ -48,8 +48,8 @@ export class WebglComponent implements OnInit {
     });
     scene: Scene = new Scene();
     postProcScene: Scene = new Scene();
-    camera = new PerspectiveCamera(20, SIZES.width / SIZES.height, 2, 200);
-    postProcCamera = new PerspectiveCamera(20, SIZES.width / SIZES.height, 2, 200);
+    camera = new PerspectiveCamera(23, SIZES.width / SIZES.height, 2, 200);
+    postProcCamera = new PerspectiveCamera(23, SIZES.width / SIZES.height, 2, 200);
     controls = new OrbitControls(this.camera, this.renderer.domElement);
     clock = new Clock();
 
@@ -60,21 +60,20 @@ export class WebglComponent implements OnInit {
         vertexShader: linev,
         fragmentShader: linef,
         uniforms: {
-            uTime: { value: 2 },
+            uTime: { value: 0 },
             uRandom: { value: 3 },
             uRandomVec4: new Uniform(new Vector4(0, 0, 0, 0)),
             uFocalDepth: { value: this.cameraFocalDistance },
             uBokehStrength: { value: this.bokehStrength },
             uMinimumLineSize: { value: 0.015 },
         },
-        side:           DoubleSide,
-        depthTest:      false,
-
-        blending:      CustomBlending,
+        side: DoubleSide,
+        depthTest: false,
+        blending: CustomBlending,
         blendEquation: AddEquation,
-        blendSrc:      OneFactor,
+        blendSrc: OneFactor,
         blendSrcAlpha: OneFactor,
-        blendDst:      OneFactor,
+        blendDst: OneFactor,
         blendDstAlpha: OneFactor,
     });
     linesMesh = new Points(this.linesGeometry, this.linesMaterial);
@@ -129,22 +128,32 @@ export class WebglComponent implements OnInit {
             const menu = document.querySelector('.webgl-container__menu');
             const tl = gsap.timeline();
             tl.from(h1, {
-                opacity: 0,
+                duration: 1.5,
+                opacity: .3,
                 ease: 'power2in',
                 delay: .5,
-            }).from(menu, {
+            }).to(h1, {
+                duration: 2.2,
+                filter: 'blur(0px)',
+                ease: 'power2out',
+                delay: .5,
+            }, ' -=1.5').from(menu, {
                 duration: 1,
                 opacity: 0,
                 ease: 'power2in',
                 delay: 0,
-            }).from(scroll, {
+            }, '-=1').from(scroll, {
                 duration: 1,
                 opacity: 0,
                 bottom: 500,
                 ease: 'power2in',
                 delay: 0,
-            });
-
+            }, '-=1.5').from('p', {
+                duration: 1,
+                opacity: 0,
+                ease: 'power4in',
+            }, '-=1');
+            // this.camera.fov += 1;
             window.addEventListener('resize', () => {
                 const sizes = {width: window.innerWidth, height: window.innerHeight};
                 this._resetCanvas();
@@ -163,12 +172,37 @@ export class WebglComponent implements OnInit {
                     this.cameraFocalDistanceMin,
                     this.cameraFocalDistanceMax,
                 );
+
+                // this.camera.position.z += 1;
+                this.camera.fov -= 1 * Math.sign(e.deltaY);
+                console.log(this.cameraFocalDistance);
+                console.log(this.camera.fov);
+                // if (this.cameraFocalDistance > 50) {
+                    // this.linesMesh.visible = false;
+                    // this.linesMesh.position.z -= 5;
+                    // this.postProcMesh.position.z -= 5;
+                    // this.linesMesh.rotation.x += 2;
+                    // this.postProcMesh.rotation.x += 2;
+                // }
             }, 100), {passive: true});
             this.el.nativeElement.addEventListener('mousemove', throttle((e: HTMLElementEventMap['mousemove']) => {
                 this.mouse.x = e.clientX;
                 this.mouse.y = e.clientY;
             }, 100), {passive: true});
             setTimeout(this._render.bind(this), 0);
+            // setTimeout( () => {
+            //     const recording = this._record(this.renderer.domElement, 10000);
+            //     const video = document.createElement('video');
+            //     document.body.appendChild(video);
+            //     recording.then(url => video.setAttribute('src', url));
+            //
+            //     const link = document.createElement('a');
+            //     link.setAttribute('download', 'recordingVideo');
+            //     recording.then(url => {
+            //         link.setAttribute('href', url);
+            //         link.click();
+            //     });
+            // }, 2500);
         });
     }
 
@@ -182,6 +216,7 @@ export class WebglComponent implements OnInit {
 
         const elapsedTime = this.clock.getElapsedTime();
         this.linesMesh.rotation.y = 50;
+        this.postProcMesh.rotation.y = 50;
         this.linesMesh.rotation.z = (this.rotationCoef * elapsedTime);
         this.postProcMesh.rotation.z = (this.rotationCoef * elapsedTime);
         this.controls.update();
@@ -217,6 +252,34 @@ export class WebglComponent implements OnInit {
         this.renderer.render(this.scene, this.camera);
         this.samples = 0;
         this.scene.background = null;
+    }
+
+    private _record (canvas: { captureStream: (arg0: number) => any; }, time: number): Promise<any> {
+        const recordedChunks: BlobPart[] | undefined = [];
+        return new Promise( res => {
+            const stream = canvas.captureStream(25 /*fps*/);
+            const mediaRecorder = new MediaRecorder(stream, {
+                mimeType: 'video/webm; codecs=vp9',
+            });
+
+            // ondataavailable will fire in interval of `time || 4000 ms`
+            mediaRecorder.start(time || 4000);
+
+            mediaRecorder.ondataavailable =  (event) => {
+                recordedChunks.push(event.data);
+                // after stop `dataavilable` event run one more time
+                if (mediaRecorder.state === 'recording') {
+                    mediaRecorder.stop();
+                }
+
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, {type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                res(url);
+            };
+        });
     }
 
 }

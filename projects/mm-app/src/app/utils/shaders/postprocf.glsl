@@ -8,12 +8,11 @@ varying vec2 vUv;
 void main() {
 
     float chromaticAberrationStrength = 0.0;
-    // uncomment if you want CA
-    chromaticAberrationStrength = length(vec2(0.5, 0.5) - vUv) * 0.0015;
+    chromaticAberrationStrength = length(vec2(0.5, 0.5) - vUv) * 0.0018;
 
     vec4 color = vec4(
     texture2D(textureOffRT, vUv + vec2(chromaticAberrationStrength, 0.0)).r,
-    texture2D(textureOffRT, vUv).g,
+    texture2D(textureOffRT, vUv + vec2(chromaticAberrationStrength, 0.0)).g,
     texture2D(textureOffRT, vUv + vec2(-chromaticAberrationStrength, 0.0)).b,
     1.0
     );

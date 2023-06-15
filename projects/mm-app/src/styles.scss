@@ -91,11 +91,19 @@ body {
         @apply fixed bottom-0 left-0;
       }
       &__content {
-        @apply flex gap-5 w-full relative items-center md:flex-col;
+        @apply flex gap-5 w-full relative items-center lg:bg-transparent md:flex-col md:bg-gray-600;
+        p {
+          @apply text-lg bg-gray-100 text-center text-slate-800
+          lg:tracking-widish lg:self-start lg:ml-10 lg:pl-4
+          md:self-center md:tracking-wide;
+        }
         h1 {
-          @apply pb-2 pl-[0.7em]
-          mb-2 uppercase tracking-widest lg:text-6xl
-          font-bold lg:tracking-wider lg:w-full md:w-1/2 md:text-5xl;
+          @apply pb-0 pl-[0.7em] blur-3xl
+          mb-0 uppercase tracking-widest lg:text-6xl
+          font-extrabold lg:tracking-wider lg:w-full md:w-1/2 md:text-5xl md:tracking-wider;
+        }
+        .end {
+          @apply self-end;
         }
       }
       .square {
