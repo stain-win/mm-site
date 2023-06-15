@@ -4,7 +4,8 @@ import {TuiDestroyService} from '@taiga-ui/cdk';
 import {debounceTime, distinctUntilChanged, filter, map, takeUntil, tap} from 'rxjs';
 import {drawCanvas, getInputErrorCorrectionLevel, toSvgString} from '../../utils/generator';
 import {Ecc, QrCode, QrSegment} from '../../utils/qrcode';
-import {QrCodeCorrectionLevel, QrCodeObj, QrCodeOutputFormat} from '../../utils/qrcode.type';
+import {QrCodeObj, QrCodeOutputFormat} from '../../utils/qrcode.type';
+import {QR_CONFIG_DEFAULT} from './qr.config';
 
 @Component({
     selector: 'mm-qrgen',
@@ -14,27 +15,10 @@ import {QrCodeCorrectionLevel, QrCodeObj, QrCodeOutputFormat} from '../../utils/
     providers: [TuiDestroyService],
 })
 export class QrgenComponent implements OnInit, AfterContentInit {
-    private qrData = {
-        content: 'https://miroslavmitrovic.rs',
-        size: 5,
-        errorCorrection: QrCodeCorrectionLevel.Medium,
-        outputFormat: QrCodeOutputFormat.vector,
-        border: 2,
-        scale: 8,
-        colors: {
-            backgroundColor: '#ffffff',
-            lightColor: '#ffffff',
-            darkColor: '#000000',
-        },
-        versionRange: {
-            verMin: 1,
-            verMax: 40,
-        },
-        maskPattern: -1,
-        boostECC: true,
-    };
-    public qrGenForm: UntypedFormGroup = this.fb.group({});
 
+    private qrData: QrCodeObj = QR_CONFIG_DEFAULT;
+
+    public qrGenForm: UntypedFormGroup = this.fb.group({});
     public svg: any;
     public canvas: any;
 
@@ -62,7 +46,7 @@ export class QrgenComponent implements OnInit, AfterContentInit {
     }
 
     ngAfterContentInit (): void {
-        this.svg = this.container.nativeElement.querySelector('#qrcode-svg');
+        this.svg = (this.container.nativeElement as HTMLElement).querySelector('#qrcode-svg');
         this._drawCode(this.qrData);
     }
 
