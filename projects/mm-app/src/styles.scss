@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import '~@taiga-ui/core/styles/taiga-ui-local';
+@import '@taiga-ui/core/styles/taiga-ui-local';
 html,
 body {
   overscroll-behavior-y: none;

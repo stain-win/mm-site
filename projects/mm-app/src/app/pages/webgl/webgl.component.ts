@@ -175,8 +175,6 @@ export class WebglComponent implements OnInit {
 
                 // this.camera.position.z += 1;
                 this.camera.fov -= 1 * Math.sign(e.deltaY);
-                console.log(this.cameraFocalDistance);
-                console.log(this.camera.fov);
                 // if (this.cameraFocalDistance > 50) {
                     // this.linesMesh.visible = false;
                     // this.linesMesh.position.z -= 5;
