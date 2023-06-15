@@ -1,5 +1,5 @@
 import {AfterContentInit, ChangeDetectionStrategy, Component, ElementRef, Inject, NgZone, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {TuiDestroyService} from '@taiga-ui/cdk';
 import {debounceTime, distinctUntilChanged, filter, map, takeUntil, tap} from 'rxjs';
 import {drawCanvas, getInputErrorCorrectionLevel, toSvgString} from '../../utils/generator';
@@ -33,7 +33,7 @@ export class QrgenComponent implements OnInit, AfterContentInit {
         maskPattern: -1,
         boostECC: true,
     };
-    public qrGenForm: FormGroup = this.fb.group({});
+    public qrGenForm: UntypedFormGroup = this.fb.group({});
 
     public svg: any;
     public canvas: any;
@@ -41,7 +41,7 @@ export class QrgenComponent implements OnInit, AfterContentInit {
     constructor (
         public container: ElementRef,
         private zone: NgZone,
-        private fb: FormBuilder,
+        private fb: UntypedFormBuilder,
         @Inject(TuiDestroyService) private readonly destroy$: TuiDestroyService,
     ) {
     }
