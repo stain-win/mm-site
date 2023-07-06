@@ -1,5 +1,5 @@
+import {QrCodeCorrectionLevel, QrCodeObj} from '../types/qrcode.type';
 import {Ecc, QrCode} from './qrcode';
-import {QrCodeCorrectionLevel, QrCodeObj} from './qrcode.type';
 
 export function toSvgString (qr: QrCode, border: number, lightColor: string, darkColor: string): string {
     if (border < 0) {

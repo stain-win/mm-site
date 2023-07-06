@@ -16,14 +16,37 @@ body {
     @apply font-mono;
     .qrgen-container {
       @apply container mx-auto;
-      &__flex {
-        @apply flex justify-center md:px-6 md:my-12 sm:my-8 sm:px-3;
+
+      h3 {
+        @apply pt-4 mb-2 text-2xl
       }
+
+      p {
+        @apply mb-4 text-sm text-slate-400;
+      }
+
+      &__flex {
+        @apply flex justify-center md:px-6 md:my-12 sm:my-8 sm:px-3 flex-col;
+      }
+
+      .qrgen-header {
+        @apply w-full mx-auto flex justify-center text-center text-3xl xl:w-3/4 lg:w-full text-slate-300;
+
+
+        &__info {
+          @apply px-8 mb-4 text-center;
+        }
+      }
+
       .qrgen-cols {
-        @apply w-full xl:w-3/4 lg:w-11/12 flex sm:flex-col md:flex-row;
+        @apply w-full mx-auto xl:w-3/4 lg:w-11/12 flex sm:flex-col md:flex-row;
 
         &__svg {
           @apply w-full h-auto lg:block lg:w-1/2 bg-cover rounded-l-lg;
+
+          svg {
+            @apply mt-10;
+          }
         }
 
         &__form {
@@ -37,18 +60,41 @@ body {
             @apply mb-4;
           }
 
-          p {
-            @apply mb-4 text-sm text-slate-500;
-          }
-
-          h3 {
-            @apply pt-4 mb-2 text-2xl
-          }
-
           form {
             @apply px-8 pt-6 pb-8 mb-4 rounded;
           }
         }
+      }
+    }
+  }
+
+  mm-qrgen-form {
+    tui-input,
+    tui-input-phone-international {
+      @apply w-full mb-4;
+    }
+
+    tui-checkbox-labeled {
+      @apply my-4 text-right;
+    }
+  }
+
+  mm-qrgen-navigation {
+    button {
+      @apply justify-around grow;
+      &:hover,
+      &:focus,
+      &:active {
+        @apply text-amber-50;
+      }
+    }
+
+    tui-tabs {
+      .qrgen-navigation__tab {
+        @apply justify-around;
+      }
+      span {
+        @apply justify-center;
       }
     }
   }

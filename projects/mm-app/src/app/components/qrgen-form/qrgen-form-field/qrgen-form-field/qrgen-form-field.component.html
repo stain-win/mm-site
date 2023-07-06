@@ -1,0 +1,42 @@
+<div [formGroup]="formGroup">
+    <div [ngSwitch]="field.type">
+        <tui-input *ngSwitchCase="QrGenFieldType.Input"
+                   [formControlName]="fieldName">
+            {{field.label}}
+            <input
+                tuiTextfield
+                placeholder="{{field.placeholder}}"
+            />
+        </tui-input>
+        <tui-input-phone-international *ngSwitchCase="QrGenFieldType.InputPhoneInternational"
+                                       [countries]="countries"
+                                       [formControlName]="fieldName"
+                                       [(countryIsoCode)]="countries[0]"
+        >
+
+        </tui-input-phone-international>
+        <tui-input-password *ngSwitchCase="QrGenFieldType.Password"
+                   [formControlName]="fieldName">
+            {{field.label}}
+            <input
+                tuiTextfield
+                placeholder="{{field.placeholder}}"
+            />
+        </tui-input-password>
+        <tui-checkbox-labeled *ngSwitchCase="QrGenFieldType.Checkbox"
+                              [formControlName]="fieldName">
+            {{field.label}}
+        </tui-checkbox-labeled>
+        <tui-text-area *ngSwitchCase="QrGenFieldType.Textarea"
+                       [formControlName]="fieldName">
+            {{field.placeholder}}
+        </tui-text-area>
+        <div *ngSwitchCase="QrGenFieldType.RadioButton" tuiGroup class="group" [collapsed]="true">
+            <ng-container *ngFor="let item of field.options">
+                <tui-radio-block size="s" contentAlign="right" [formControlName]="fieldName" [item]="item['value']">
+                    {{item['label']}}
+                </tui-radio-block>
+            </ng-container>
+        </div>
+    </div>
+</div>

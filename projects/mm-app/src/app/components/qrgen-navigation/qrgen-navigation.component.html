@@ -1,0 +1,7 @@
+<tui-tabs [(activeItemIndex)]="activeItemIndex">
+    <button class="qrgen-navigation__tab" *ngFor="let option of options"
+            tuiTab
+            (click)="onClick(option)">
+        {{option}}
+    </button>
+</tui-tabs>

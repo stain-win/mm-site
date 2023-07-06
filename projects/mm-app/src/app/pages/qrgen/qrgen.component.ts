@@ -1,11 +1,17 @@
 import {AfterContentInit, ChangeDetectionStrategy, Component, ElementRef, Inject, NgZone, OnInit} from '@angular/core';
-import {UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {FormBuilder} from '@angular/forms';
 import {TuiDestroyService} from '@taiga-ui/cdk';
-import {debounceTime, distinctUntilChanged, filter, map, takeUntil, tap} from 'rxjs';
+import {
+    emailFormConf,
+    smsFormConf,
+    urlFormConf,
+    vCardFormConf,
+    wifiFormConf,
+} from '../../components/qrgen-form/qrgen-form-conf';
+import {QR_GEN_FORM_TYPE} from '../../types/qr-gen-form.base';
+import {QrCodeObj, QrCodeOutputFormat} from '../../types/qrcode.type';
 import {drawCanvas, getInputErrorCorrectionLevel, toSvgString} from '../../utils/generator';
-import {Ecc, QrCode, QrSegment} from '../../utils/qrcode';
-import {QrCodeObj, QrCodeOutputFormat} from '../../utils/qrcode.type';
-import {QR_CONFIG_DEFAULT} from './qr.config';
+import { QrCode, QrSegment} from '../../utils/qrcode';
 
 @Component({
     selector: 'mm-qrgen',
@@ -15,43 +21,54 @@ import {QR_CONFIG_DEFAULT} from './qr.config';
     providers: [TuiDestroyService],
 })
 export class QrgenComponent implements OnInit, AfterContentInit {
-
-    private qrData: QrCodeObj = QR_CONFIG_DEFAULT;
-
-    public qrGenForm: UntypedFormGroup = this.fb.group({});
     public svg: any;
     public canvas: any;
+    public formType = QR_GEN_FORM_TYPE.URL;
+    public formConfig = urlFormConf;
 
     constructor (
         public container: ElementRef,
         private zone: NgZone,
-        private fb: UntypedFormBuilder,
+        private fb: FormBuilder,
         @Inject(TuiDestroyService) private readonly destroy$: TuiDestroyService,
     ) {
     }
 
     ngOnInit (): void {
-        this._buildForm();
-        this.qrGenForm.valueChanges.pipe(
-            distinctUntilChanged(),
-            debounceTime(300),
-            map((val) => val.qrCodeValue.trim()),
-            filter((val: string) => val.length > 0),
-            tap(val => {
-                this.qrData.content = val;
-                this._drawCode(this.qrData);
-            }),
-            takeUntil(this.destroy$),
-        ).subscribe();
+    }
+
+    setQrGenFormType (option: QR_GEN_FORM_TYPE): void {
+        this.formType = option;
+        switch (option) {
+            case QR_GEN_FORM_TYPE.URL:
+                this.formConfig = urlFormConf;
+                break;
+            case QR_GEN_FORM_TYPE.Wifi:
+                this.formConfig = wifiFormConf;
+                break;
+            case QR_GEN_FORM_TYPE.VCard:
+                this.formConfig = vCardFormConf;
+                break;
+            case QR_GEN_FORM_TYPE.SMS:
+                this.formConfig = smsFormConf;
+                break;
+            case QR_GEN_FORM_TYPE.Email:
+                this.formConfig = emailFormConf;
+                break;
+            default:
+                this.formConfig = urlFormConf;
+        }
+    }
+
+    drawCode ($event: QrCodeObj): void {
+        this._drawCode($event);
     }
 
     ngAfterContentInit (): void {
         this.svg = (this.container.nativeElement as HTMLElement).querySelector('#qrcode-svg');
-        this._drawCode(this.qrData);
     }
 
     private _drawCode (qr: QrCodeObj): void {
-        const qrCode = QrCode.encodeText(qr.content, Ecc.QUARTILE);
         const segQr = QrSegment.makeSegments(qr.content);
         const qrCode1 = QrCode.encodeSegments(
             segQr,
@@ -70,10 +87,6 @@ export class QrgenComponent implements OnInit, AfterContentInit {
                 this._drawCanvas(qrCode1, qr);
                 break;
         }
-    }
-
-    private _buildForm (): void {
-        this.qrGenForm.addControl('qrCodeValue', this.fb.control(''));
     }
 
     private _drawSvg (qrCode: QrCode, qr: QrCodeObj): void {

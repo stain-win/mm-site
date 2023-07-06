@@ -1,4 +1,4 @@
-import {QrCodeCorrectionLevel, QrCodeOutputFormat} from '../../utils/qrcode.type';
+import {QrCodeCorrectionLevel, QrCodeOutputFormat} from '../../types/qrcode.type';
 
 export const QR_CONFIG_DEFAULT = {
     content: 'https://miroslavmitrovic.rs',
