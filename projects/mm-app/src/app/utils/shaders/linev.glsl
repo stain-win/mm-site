@@ -143,22 +143,15 @@ p4 = fract(p4  * vec4(.1031, .1030, .0973, .1099));
     return fract((p4.xxyz+p4.yzzw)*p4.zywx);
 }
 
+float hash2T( vec2 n )
+{
+    float t = fract( uTime );
+    float float12 = hash12( n + 0.7*t );
+    return float12;
+}
+
 
 void main() {
-
-    // Uncomment these and comment the ones below and have fun with the result you'll get
-    // float o1 = hash12( vec2(uRandom + aSeed.x, uRandomVec4.x) );
-    // float o2 = hash12( vec2(uRandom + aSeed.x, uRandomVec4.x) );
-    // float o3 = hash12( vec2(uRandom + aSeed.x, uRandomVec4.x) );
-    // float o4 = hash12( vec2(uRandom + aSeed.x, uRandomVec4.x) );
-    // float o5 = hash12( vec2(uRandom + aSeed.x, uRandomVec4.w) );
-
-    // float o1 = hash12( vec2(uRandom + aSeed.w, uRandomVec4.x) );
-    // float o2 = hash12( vec2(uRandom + aSeed.w, uRandomVec4.x) );
-    // float o3 = hash12( vec2(uRandom + aSeed.z, uRandomVec4.x) );
-    // float o4 = hash12( vec2(uRandom + aSeed.x, uRandomVec4.x) );
-    // float o5 = hash12( vec2(uRandom + aSeed.y, uRandomVec4.w) );
-
     float o1 = hash12( vec2(uRandom + aSeed.x, uRandomVec4.x) );
     float o2 = hash12( vec2(uRandom + aSeed.y, uRandomVec4.y) );
     float o3 = hash12( vec2(uRandom + aSeed.z, uRandomVec4.z) );
@@ -190,15 +183,6 @@ void main() {
     float z = R * pow(lambda, 0.33333) * u;
 
     positiont += vec3(x, y, z);
-
-
-	// two different functions for color attenuation if you need it
-
-//	vColor = vec3(
-//		vColor.r * exp(-distanceFromFocalPoint * 0.1),
-//		vColor.g * exp(-distanceFromFocalPoint * 0.1),
-//		vColor.b * exp(-distanceFromFocalPoint * 0.1)
-//	);
 
 	 vColor = vec3(
 	 	vColor.r / (1.0 + pow(distanceFromFocalPoint * 0.015, 2.71828)),
