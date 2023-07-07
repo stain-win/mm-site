@@ -44,8 +44,15 @@ body {
         &__svg {
           @apply w-full h-auto lg:block lg:w-1/2 bg-cover rounded-l-lg;
 
-          svg {
+          > svg {
             @apply mt-10;
+          }
+          &-action {
+            @apply flex-row justify-evenly items-center my-5 text-center;
+
+            button {
+              @apply mx-3.5;
+            }
           }
         }
 

@@ -1,6 +1,8 @@
 import {CommonModule} from '@angular/common';
+import {HttpClient, HttpClientModule} from '@angular/common/http';
 import {NgModule} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
+import {TuiButtonModule} from '@taiga-ui/core';
 import {TuiInputModule, TuiTextAreaModule} from '@taiga-ui/kit';
 import {QrgenFormModule} from '../components/qrgen-form/qrgen-form.module';
 import {QrgenNavigationModule} from '../components/qrgen-navigation/qrgen-navigation.module';
@@ -25,6 +27,8 @@ import {QrgenComponent} from './qrgen/qrgen.component';
         TuiInputModule,
         QrgenFormModule,
         QrgenNavigationModule,
+        TuiButtonModule,
+        HttpClientModule,
     ],
 })
 export class PagesModule {

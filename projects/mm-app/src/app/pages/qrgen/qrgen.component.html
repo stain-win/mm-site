@@ -17,6 +17,16 @@
                         <rect width="100%" height="100%" fill="#FFFFFF" stroke-width="0"></rect>
                         <path d="" fill="#101010" stroke-width="0"></path>
                     </svg>
+                    <div class="qrgen-cols__svg-action">
+                        <button tuiButton size="s" type="button"
+                                (click)="downloadCode($event, QR_CODE_DOWNLOAD_FORMAT.PNG)"
+                                aria-label="Save code as PDF"
+                                iconRight="tuiIconDownload">Download PNG</button>
+                        <button tuiButton size="s" type="button"
+                                (click)="downloadCode($event, QR_CODE_DOWNLOAD_FORMAT.SVG)"
+                                aria-label="Save code as SVG"
+                                iconRight="tuiIconDownload">Download SVG</button>
+                    </div>
                 </div>
             </div>
             <!-- Col -->

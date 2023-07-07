@@ -3,7 +3,11 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false,
+    production: false,
+    basePath: '',
+    baseApiPath: '/api',
+    qrApiUrl: 'http://localhost:3200/',
+    apiPath: '/qr',
 };
 
 /*
