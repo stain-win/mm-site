@@ -1,5 +1,3 @@
-import {QrCodeCorrectionLevel} from './qrcode.type';
-
 export interface QrGenField {
     label: string;
     type: QrGenFieldType;
@@ -73,4 +71,9 @@ export enum QR_GEN_FORM_TYPE {
     Wifi = 'Wifi',
     SMS = 'SMS',
     Email = 'Email',
+}
+
+export enum QR_CODE_DOWNLOAD_FORMAT {
+    PNG = 'png',
+    SVG = 'svg',
 }

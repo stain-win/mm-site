@@ -2,7 +2,7 @@ import {QrCodeCorrectionLevel, QrCodeOutputFormat} from '../../types/qrcode.type
 
 export const QR_CONFIG_DEFAULT = {
     content: 'https://miroslavmitrovic.rs',
-    size: 5,
+    size: 256,
     errorCorrection: QrCodeCorrectionLevel.Medium,
     outputFormat: QrCodeOutputFormat.vector,
     border: 2,
@@ -13,9 +13,9 @@ export const QR_CONFIG_DEFAULT = {
         darkColor: '#000000',
     },
     versionRange: {
-        verMin: 1,
+        verMin: 2,
         verMax: 40,
     },
     maskPattern: -1,
-    boostECC: true,
+    boostECL: true,
 };

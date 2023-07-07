@@ -1,8 +1,8 @@
 export enum QrCodeCorrectionLevel {
-  Low = 'low',
-  Medium = 'medium',
-  Quartile = 'quartile',
-  High = 'high',
+  Low,
+  Medium,
+  Quartile,
+  High,
 }
 
 export enum QrCodeOutputFormat {
@@ -28,7 +28,7 @@ export interface QrCodeObj {
   colors: QrCodeColor;
   versionRange: QrCodeVersionRange;
   maskPattern: number;
-  boostECC: boolean;
+  boostECL: boolean;
 }
 
 export interface QrCodeState {
