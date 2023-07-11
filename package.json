@@ -4,7 +4,9 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build mm-app",
+    "build": "ng build mm-lib && ng build mm-app",
+    "build:app": "ng build mm-app",
+    "build:lib": "ng build mm-lib",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
