@@ -58,7 +58,6 @@ export class QrgenFormComponent implements OnInit, OnChanges {
                 if (this.formType === QR_GEN_FORM_TYPE.VCard) {
                     qrConfig.size = 8;
                 }
-                console.log(qrCodeContent);
                 this.qrGenData.emit({ ...QR_CONFIG_DEFAULT, content: qrCodeContent});
             }),
             takeUntil(this.destroy$),

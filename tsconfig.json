@@ -10,10 +10,9 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "paths": {
-      "mm-lib": [
-        "dist/mm-lib/mm-lib",
+      "@mm-lib": [
         "dist/mm-lib"
-      ]
+      ],
     },
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
