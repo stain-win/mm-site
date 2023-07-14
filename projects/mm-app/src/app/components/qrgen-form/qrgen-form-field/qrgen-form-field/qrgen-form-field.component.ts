@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FormGroup} from '@angular/forms';
+import {QrGenField, QrGenFieldType} from '@mm-lib/qr';
 import {TuiCountryIsoCode} from '@taiga-ui/i18n';
-import {QrGenField, QrGenFieldType} from '../../../../types/qr-gen-form.base';
 
 @Component({
     selector: 'mm-qrgen-form-field',

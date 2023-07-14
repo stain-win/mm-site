@@ -1,4 +1,4 @@
-import {QrGenField, QrGenFieldType} from '../../types/qr-gen-form.base';
+import {QrGenField, QrGenFieldType} from '@mm-lib/qr';
 
 export const urlFormConf: Record<string, QrGenField> = {
     url: {

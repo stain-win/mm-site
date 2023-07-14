@@ -1,11 +1,11 @@
 import {Component, EventEmitter, Inject, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
+import {QrCodeObj} from '@mm-lib';
+import {QrGenField, QR_CODE_OPTIONS, QR_GEN_FORM_TYPE} from '@mm-lib/qr';
 import {TuiDestroyService} from '@taiga-ui/cdk';
 import {mapValues} from 'lodash';
 import {debounceTime, distinctUntilChanged, map, takeUntil, tap} from 'rxjs';
-import {QR_CONFIG_DEFAULT} from '../../pages/qrgen/qr.config';
-import {QrGenField, QR_GEN_FORM_TYPE} from '../../types/qr-gen-form.base';
-import {QrCodeObj} from '../../types/qrcode.type';
+
 import {EntriesOf, EntryOf} from '../../types/utils';
 import {
     generateEmailContent, generateSmsContent,
@@ -30,11 +30,10 @@ export class QrgenFormComponent implements OnInit, OnChanges {
     public qrGenForm!: FormGroup;
     public qrGenFormFields: EntryOf<Record<string, QrGenField>>[] | undefined;
 
-    // public qrData: QrCodeObj = QR_CONFIG_DEFAULT;
-
     constructor (
         private fb: FormBuilder,
         protected qrgenFormService: QrgenFormService,
+        @Inject(QR_CODE_OPTIONS) public qrCode: QrCodeObj,
         @Inject(TuiDestroyService) private readonly destroy$: TuiDestroyService,
     ) {
     }
@@ -44,8 +43,8 @@ export class QrgenFormComponent implements OnInit, OnChanges {
     ngOnChanges (changes: SimpleChanges): void {
         this.qrGenFormFields = this.objEntries<typeof this.formConfig>(this.formConfig);
         this.qrGenForm = this.qrgenFormService.toForm(this.formConfig);
-        // console.log(this.qrGenForm.getRawValue());
-        this.qrGenData.emit({ ...QR_CONFIG_DEFAULT, content: this.generateQrCodeContent(this.qrGenForm.getRawValue())});
+
+        this.qrGenData.emit({ ...this.qrCode, content: this.generateQrCodeContent(this.qrGenForm.getRawValue())});
         this.qrGenForm.valueChanges.pipe(
             distinctUntilChanged(),
             debounceTime(300),
@@ -54,11 +53,11 @@ export class QrgenFormComponent implements OnInit, OnChanges {
             }),
             tap(val => {
                 const qrCodeContent = this.generateQrCodeContent(val);
-                const qrConfig = { ...QR_CONFIG_DEFAULT };
+                const qrConfig = { ...this.qrCode};
                 if (this.formType === QR_GEN_FORM_TYPE.VCard) {
                     qrConfig.size = 8;
                 }
-                this.qrGenData.emit({ ...QR_CONFIG_DEFAULT, content: qrCodeContent});
+                this.qrGenData.emit({ ...this.qrCode, content: qrCodeContent});
             }),
             takeUntil(this.destroy$),
         ).subscribe();

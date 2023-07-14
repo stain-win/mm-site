@@ -1,4 +1,5 @@
-import {QrCodeCorrectionLevel, QrCodeOutputFormat} from '../../types/qrcode.type';
+import {QrCodeCorrectionLevel, QrCodeOutputFormat} from '@mm-lib';
+import {createInjectOptions} from '@mm-lib/utils';
 
 export const QR_CONFIG_DEFAULT = {
     content: 'https://miroslavmitrovic.rs',
@@ -19,3 +20,5 @@ export const QR_CONFIG_DEFAULT = {
     maskPattern: -1,
     boostECL: true,
 };
+
+export const QR_CODE_OPTIONS = createInjectOptions(QR_CONFIG_DEFAULT);

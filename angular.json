@@ -123,10 +123,16 @@
       "root": "projects/mm-lib",
       "sourceRoot": "projects/mm-lib/src",
       "prefix": "mm",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "builder": "@angular-devkit/build-angular:ng-packagr:build",
           "options": {
+            "tsConfig": "projects/mm-lib/tsconfig.lib.json",
             "project": "projects/mm-lib/src/lib/ng-package.json"
           },
           "configurations": {
@@ -136,8 +142,7 @@
             "development": {
               "tsConfig": "projects/mm-lib/tsconfig.lib.json"
             }
-          },
-          "defaultConfiguration": "production"
+          }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
