@@ -1,4 +1,4 @@
-import {QrCodeCorrectionLevel, QrCodeObj} from '../types/qrcode.type';
+import {QrCodeCorrectionLevel, QrCodeObj} from '@mm-lib';
 import {Ecc, QrCode} from './qrcode';
 
 export function toSvgString (qr: QrCode, border: number, lightColor: string, darkColor: string): string {

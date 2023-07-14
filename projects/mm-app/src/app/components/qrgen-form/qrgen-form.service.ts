@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {FormControl, FormGroup} from '@angular/forms';
-import {QrGenField} from '../../types/qr-gen-form.base';
+import {QrGenField} from '@mm-lib/qr';
 
 @Injectable({
     providedIn: 'root',

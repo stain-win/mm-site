@@ -1,5 +1,7 @@
 import {AfterContentInit, ChangeDetectionStrategy, Component, ElementRef, Inject, NgZone, OnInit} from '@angular/core';
 import {FormBuilder} from '@angular/forms';
+import {QrCodeObj, QrCodeOutputFormat} from '@mm-lib';
+import {QR_CODE_DOWNLOAD_FORMAT, QR_CODE_OPTIONS, QR_GEN_FORM_TYPE} from '@mm-lib/qr';
 import {TuiDestroyService} from '@taiga-ui/cdk';
 import {
     emailFormConf,
@@ -9,11 +11,8 @@ import {
     wifiFormConf,
 } from '../../components/qrgen-form/qrgen-form-conf';
 import {QrgeneratorService} from '../../services/qrgenerator.service';
-import {QR_CODE_DOWNLOAD_FORMAT, QR_GEN_FORM_TYPE} from '../../types/qr-gen-form.base';
-import {QrCodeObj, QrCodeOutputFormat} from '../../types/qrcode.type';
 import {drawCanvas, getInputErrorCorrectionLevel, toSvgString} from '../../utils/generator';
 import { QrCode, QrSegment} from '../../utils/qrcode';
-import {QR_CONFIG_DEFAULT} from './qr.config';
 
 @Component({
     selector: 'mm-qrgen',
@@ -29,13 +28,13 @@ export class QrgenComponent implements OnInit, AfterContentInit {
     public canvas: any;
     public formType = QR_GEN_FORM_TYPE.URL;
     public formConfig = urlFormConf;
-    public qrCode: QrCodeObj = QR_CONFIG_DEFAULT;
 
     constructor (
         public container: ElementRef,
         protected qrgeneratorService: QrgeneratorService,
         private zone: NgZone,
         private fb: FormBuilder,
+        @Inject(QR_CODE_OPTIONS) public qrCode: QrCodeObj,
         @Inject(TuiDestroyService) private readonly destroy$: TuiDestroyService,
     ) {
     }

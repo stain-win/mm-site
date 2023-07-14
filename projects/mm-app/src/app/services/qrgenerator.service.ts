@@ -1,8 +1,8 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
+import {QrCodeObj} from '@mm-lib';
 import {Observable, tap} from 'rxjs';
 import {environment} from '../../environments/environment';
-import {QrCodeObj} from '../types/qrcode.type';
 
 @Injectable({
     providedIn: 'root',

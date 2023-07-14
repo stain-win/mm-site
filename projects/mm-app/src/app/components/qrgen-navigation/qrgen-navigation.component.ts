@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Output} from '@angular/core';
-import {QR_GEN_FORM_TYPE} from '../../types/qr-gen-form.base';
+import { QR_GEN_FORM_TYPE } from '@mm-lib/qr';
 
 @Component({
   selector: 'mm-qrgen-navigation',

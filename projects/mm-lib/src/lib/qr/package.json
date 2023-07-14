@@ -1,0 +1,8 @@
+{
+  "name": "@mm-lib/qr",
+  "ngPackage": {
+    "lib": {
+      "entryFile": "./public_api.ts"
+    }
+  }
+}

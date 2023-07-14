@@ -10,9 +10,14 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "paths": {
-      "@mm-lib": [
-        "dist/mm-lib"
+      "@mm-lib/*": [
+        "dist/mm-lib/*",
+        "projects/mm-lib/src/lib/*"
       ],
+      "@mm-lib": [
+        "dist/mm-lib",
+        "projects/mm-lib/src/lib"
+      ]
     },
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
@@ -38,6 +43,7 @@
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
-    "strictTemplates": true
+    "strictTemplates": true,
+    "enableIvy": true
   }
 }
