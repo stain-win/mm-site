@@ -1,8 +1,16 @@
-import {AfterContentInit, ChangeDetectionStrategy, Component, ElementRef, Inject, NgZone, OnInit} from '@angular/core';
+import {
+    AfterViewInit,
+    ChangeDetectionStrategy,
+    Component,
+    ElementRef,
+    Inject,
+    NgZone,
+} from '@angular/core';
 import {FormBuilder} from '@angular/forms';
 import {QrCodeObj, QrCodeOutputFormat} from '@mm-lib';
 import {QR_CODE_DOWNLOAD_FORMAT, QR_CODE_OPTIONS, QR_GEN_FORM_TYPE} from '@mm-lib/qr';
 import {TuiDestroyService} from '@taiga-ui/cdk';
+import {animationFrameScheduler, observeOn, of, takeUntil, tap} from 'rxjs';
 import {
     emailFormConf,
     smsFormConf,
@@ -21,7 +29,7 @@ import { QrCode, QrSegment} from '../../utils/qrcode';
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [TuiDestroyService, QrgeneratorService],
 })
-export class QrgenComponent implements OnInit, AfterContentInit {
+export class QrgenComponent implements AfterViewInit {
     protected readonly QR_CODE_DOWNLOAD_FORMAT = QR_CODE_DOWNLOAD_FORMAT;
 
     public svg: any;
@@ -37,9 +45,6 @@ export class QrgenComponent implements OnInit, AfterContentInit {
         @Inject(QR_CODE_OPTIONS) public qrCode: QrCodeObj,
         @Inject(TuiDestroyService) private readonly destroy$: TuiDestroyService,
     ) {
-    }
-
-    ngOnInit (): void {
     }
 
     setQrGenFormType (option: QR_GEN_FORM_TYPE): void {
@@ -66,16 +71,18 @@ export class QrgenComponent implements OnInit, AfterContentInit {
     }
 
     drawCode ($event: QrCodeObj): void {
-        this.qrCode = $event;
-        this._drawCode($event);
+        of($event).pipe(
+            tap(qr => this.qrCode = qr),
+            observeOn(animationFrameScheduler),
+            takeUntil(this.destroy$),
+        ).subscribe( qr => this._drawCode(qr));
     }
 
-    ngAfterContentInit (): void {
+    ngAfterViewInit (): void {
         this.svg = (this.container.nativeElement as HTMLElement).querySelector('#qrcode-svg');
     }
 
     downloadCode ($event: MouseEvent, format: QR_CODE_DOWNLOAD_FORMAT): void {
-        const el = $event.target as Element;
         switch (format) {
             case QR_CODE_DOWNLOAD_FORMAT.SVG:
                 this.qrgeneratorService.downloadQrSVG(this.qrCode).subscribe();

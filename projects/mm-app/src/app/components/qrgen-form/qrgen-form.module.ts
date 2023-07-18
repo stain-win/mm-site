@@ -5,7 +5,7 @@ import {TuiGroupModule} from '@taiga-ui/core';
 import {
     TuiCheckboxLabeledModule,
     TuiInputModule,
-    TuiInputPasswordModule, TuiInputPhoneInternationalModule,
+    TuiInputPasswordModule, TuiInputPhoneInternationalModule, TuiInputPhoneModule,
     TuiRadioBlockModule,
     TuiTextAreaModule,
 } from '@taiga-ui/kit';
@@ -28,6 +28,7 @@ import {QrgenFormComponent} from './qrgen-form.component';
         TuiGroupModule,
         TuiRadioBlockModule,
         TuiInputPhoneInternationalModule,
+        TuiInputPhoneModule,
     ],
     exports: [
         QrgenFormComponent,

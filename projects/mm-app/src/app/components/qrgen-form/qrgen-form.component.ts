@@ -1,4 +1,13 @@
-import {Component, EventEmitter, Inject, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
+import {
+    ChangeDetectionStrategy,
+    Component,
+    EventEmitter,
+    Inject,
+    Input,
+    OnChanges,
+    Output,
+    SimpleChanges,
+} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {QrCodeObj} from '@mm-lib';
 import {QrGenField, QR_CODE_OPTIONS, QR_GEN_FORM_TYPE} from '@mm-lib/qr';
@@ -20,8 +29,9 @@ import {QrgenFormService} from './qrgen-form.service';
     templateUrl: './qrgen-form.component.html',
     styleUrls: ['./qrgen-form.component.scss'],
     providers: [TuiDestroyService, QrgenFormService],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class QrgenFormComponent implements OnInit, OnChanges {
+export class QrgenFormComponent implements OnChanges {
     @Input() public formConfig: Record<string, QrGenField> = {};
     @Input() public formType = QR_GEN_FORM_TYPE.URL;
 
@@ -36,9 +46,6 @@ export class QrgenFormComponent implements OnInit, OnChanges {
         @Inject(QR_CODE_OPTIONS) public qrCode: QrCodeObj,
         @Inject(TuiDestroyService) private readonly destroy$: TuiDestroyService,
     ) {
-    }
-
-    ngOnInit (): void {
     }
     ngOnChanges (changes: SimpleChanges): void {
         this.qrGenFormFields = this.objEntries<typeof this.formConfig>(this.formConfig);
