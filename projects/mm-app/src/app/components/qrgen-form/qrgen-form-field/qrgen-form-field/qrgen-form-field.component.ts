@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {QrGenField, QrGenFieldType} from '@mm-lib/qr';
 import {TuiCountryIsoCode} from '@taiga-ui/i18n';
@@ -7,9 +7,9 @@ import {TuiCountryIsoCode} from '@taiga-ui/i18n';
     selector: 'mm-qrgen-form-field',
     templateUrl: './qrgen-form-field.component.html',
     styleUrls: ['./qrgen-form-field.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QrgenFormFieldComponent implements OnInit {
-
     get isValid (): boolean {
         return this.formGroup.get(this.field.label)?.valid as boolean;
     }

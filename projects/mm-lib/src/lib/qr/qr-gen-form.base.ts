@@ -9,6 +9,7 @@ export interface QrGenField {
 export enum QrGenFieldType {
     Input = 'input',
     InputPhoneInternational = 'inputPhoneInternational',
+    InputPhone = 'inputPhone',
     Password = 'password',
     Textarea = 'text',
     Select = 'select',

@@ -77,7 +77,8 @@ body {
 
   mm-qrgen-form {
     tui-input,
-    tui-input-phone-international {
+    tui-input-phone-international,
+    tui-input-phone {
       @apply w-full mb-4;
     }
 

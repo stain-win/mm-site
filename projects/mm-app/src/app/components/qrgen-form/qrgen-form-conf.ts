@@ -30,7 +30,7 @@ export const vCardFormConf: Record<string, QrGenField> = {
     },
     contact: {
         label: 'Contact',
-        type: QrGenFieldType.InputPhoneInternational,
+        type: QrGenFieldType.InputPhone,
         placeholder: '+1 123 456 7890',
         validators: {
             // TODO: add phone number validator
@@ -38,7 +38,7 @@ export const vCardFormConf: Record<string, QrGenField> = {
     },
     contact1: {
         label: 'Contact',
-        type: QrGenFieldType.InputPhoneInternational,
+        type: QrGenFieldType.InputPhone,
         placeholder: '+1 123 456 7890',
         validators: {
             // TODO: add phone number validator
@@ -153,7 +153,7 @@ export const wifiFormConf: Record<string, QrGenField>  = {
 export const smsFormConf: Record<string, QrGenField> = {
     number: {
         label: 'Number',
-        type: QrGenFieldType.InputPhoneInternational,
+        type: QrGenFieldType.InputPhone,
         placeholder: '+1 123 456 7890',
         validators: {
             required: true,

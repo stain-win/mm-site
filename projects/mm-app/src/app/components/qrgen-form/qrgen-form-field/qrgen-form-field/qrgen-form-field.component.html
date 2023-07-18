@@ -15,6 +15,14 @@
         >
 
         </tui-input-phone-international>
+        <tui-input-phone *ngSwitchCase="QrGenFieldType.InputPhone"
+                         [formControlName]="fieldName">
+            {{field.label}}
+            <input
+                tuiTextfield
+                placeholder="{{field.placeholder}}"
+            />
+        </tui-input-phone>
         <tui-input-password *ngSwitchCase="QrGenFieldType.Password"
                    [formControlName]="fieldName">
             {{field.label}}

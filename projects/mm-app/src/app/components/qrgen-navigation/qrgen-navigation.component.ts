@@ -1,10 +1,10 @@
-import {Component, EventEmitter, Output} from '@angular/core';
-import { QR_GEN_FORM_TYPE } from '@mm-lib/qr';
+import {ChangeDetectionStrategy, Component, EventEmitter, Output} from '@angular/core';
+import {QR_GEN_FORM_TYPE} from '@mm-lib/qr';
 
 @Component({
-  selector: 'mm-qrgen-navigation',
-  templateUrl: './qrgen-navigation.component.html',
-  styleUrls: ['./qrgen-navigation.component.scss'],
+    selector: 'mm-qrgen-navigation',
+    templateUrl: './qrgen-navigation.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QrgenNavigationComponent {
     activeItemIndex = 0;
