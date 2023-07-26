@@ -42,7 +42,7 @@ body {
         @apply w-full mx-auto xl:w-3/4 lg:w-11/12 flex sm:flex-col md:flex-row;
 
         &__svg {
-          @apply w-full h-auto lg:block lg:w-1/2 bg-cover rounded-l-lg;
+          @apply w-full h-auto bg-cover rounded-l-lg lg:block lg:w-1/2;
 
           > svg {
             @apply mt-10;
@@ -51,7 +51,7 @@ body {
             @apply flex-row justify-evenly items-center my-5 text-center;
 
             button {
-              @apply mx-3.5;
+              @apply mx-3.5 md:mx-1.5;
             }
           }
         }

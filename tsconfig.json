@@ -12,11 +12,11 @@
     "paths": {
       "@mm-lib/*": [
         "dist/mm-lib/*",
-        "projects/mm-lib/src/lib/*"
+//        "projects/mm-lib/src/lib/*"
       ],
       "@mm-lib": [
         "dist/mm-lib",
-        "projects/mm-lib/src/lib"
+//        "projects/mm-lib/src/lib"
       ]
     },
     "noFallthroughCasesInSwitch": true,

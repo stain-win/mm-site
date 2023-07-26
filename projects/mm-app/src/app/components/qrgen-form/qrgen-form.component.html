@@ -1,7 +1,7 @@
 <form [formGroup]="qrGenForm">
     <div [formGroup]="qrGenForm">
-        <div *ngFor="let field of qrGenFormFields">
-            <mm-qrgen-form-field [fieldRecord]="field" [formGroup]="qrGenForm">
+        <div *ngFor="let field of qrGenFormFields; let i = index">
+            <mm-qrgen-form-field [fieldRecord]="field" [formGroup]="qrGenForm" [autoFocus]="!i">
             </mm-qrgen-form-field>
         </div>
     </div>

@@ -1,6 +1,7 @@
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
+import {TuiAutoFocusModule} from '@taiga-ui/cdk';
 import {TuiGroupModule} from '@taiga-ui/core';
 import {
     TuiCheckboxLabeledModule,
@@ -29,6 +30,7 @@ import {QrgenFormComponent} from './qrgen-form.component';
         TuiRadioBlockModule,
         TuiInputPhoneInternationalModule,
         TuiInputPhoneModule,
+        TuiAutoFocusModule,
     ],
     exports: [
         QrgenFormComponent,

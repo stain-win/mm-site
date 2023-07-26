@@ -1,6 +1,7 @@
 <div [formGroup]="formGroup">
     <div [ngSwitch]="field.type">
         <tui-input *ngSwitchCase="QrGenFieldType.Input"
+                   [tuiAutoFocus]="autoFocus"
                    [formControlName]="fieldName">
             {{field.label}}
             <input
@@ -10,12 +11,14 @@
         </tui-input>
         <tui-input-phone-international *ngSwitchCase="QrGenFieldType.InputPhoneInternational"
                                        [countries]="countries"
+                                       [tuiAutoFocus]="autoFocus"
                                        [formControlName]="fieldName"
                                        [(countryIsoCode)]="countries[0]"
         >
 
         </tui-input-phone-international>
         <tui-input-phone *ngSwitchCase="QrGenFieldType.InputPhone"
+                         [tuiAutoFocus]="autoFocus"
                          [formControlName]="fieldName">
             {{field.label}}
             <input
@@ -24,6 +27,7 @@
             />
         </tui-input-phone>
         <tui-input-password *ngSwitchCase="QrGenFieldType.Password"
+                            [tuiAutoFocus]="autoFocus"
                    [formControlName]="fieldName">
             {{field.label}}
             <input
@@ -32,10 +36,12 @@
             />
         </tui-input-password>
         <tui-checkbox-labeled *ngSwitchCase="QrGenFieldType.Checkbox"
+                              [tuiAutoFocus]="autoFocus"
                               [formControlName]="fieldName">
             {{field.label}}
         </tui-checkbox-labeled>
         <tui-text-area *ngSwitchCase="QrGenFieldType.Textarea"
+                       [tuiAutoFocus]="autoFocus"
                        [formControlName]="fieldName">
             {{field.placeholder}}
         </tui-text-area>
