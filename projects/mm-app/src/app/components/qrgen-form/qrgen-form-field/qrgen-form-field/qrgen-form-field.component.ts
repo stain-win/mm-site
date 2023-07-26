@@ -24,6 +24,9 @@ export class QrgenFormFieldComponent implements OnInit {
     @Input()
     public formGroup!: FormGroup;
 
+    @Input()
+    public autoFocus = false;
+
     public countries: TuiCountryIsoCode[] = Object.values(TuiCountryIsoCode).sort();
 
     ngOnInit (): void {

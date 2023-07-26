@@ -154,7 +154,7 @@ export const smsFormConf: Record<string, QrGenField> = {
     number: {
         label: 'Number',
         type: QrGenFieldType.InputPhone,
-        placeholder: '+1 123 456 7890',
+        placeholder: '+1 123 456 789',
         validators: {
             required: true,
         },
@@ -195,3 +195,5 @@ export const emailFormConf: Record<string, QrGenField> = {
         },
     },
 };
+
+export const defaultFormConf = urlFormConf;

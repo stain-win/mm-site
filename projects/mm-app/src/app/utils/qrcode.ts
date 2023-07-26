@@ -25,6 +25,8 @@
 'use strict';
 
 
+import {Memoize} from 'typescript-memoize';
+
 type bit = number;
 type byte = number;
 type int = number;
@@ -47,72 +49,6 @@ type int = number;
  * (Note that all ways require supplying the desired error correction level.)
  */
 export class QrCode {
-    /*-- Constructor (low level) and fields --*/
-
-    // Creates a new QR Code with the given version number,
-    // error correction level, data codeword bytes, and mask number.
-    // This is a low-level API that most users should not use directly.
-    // A mid-level API is the encodeSegments() function.
-    public constructor (
-        // The version number of this QR Code, which is between 1 and 40 (inclusive).
-        // This determines the size of this barcode.
-        public readonly version: int,
-        // The error correction level used in this QR Code.
-        public readonly errorCorrectionLevel: Ecc,
-        dataCodewords: Readonly<Array<byte>>,
-        msk: int) {
-
-        // Check scalar arguments
-        if (version < QrCode.MIN_VERSION || version > QrCode.MAX_VERSION) {
-            throw new Error('Version value out of range');
-        }
-        if (msk < -1 || msk > 7) {
-            throw new Error('Mask value out of range');
-        }
-        this.size = version * 4 + 17;
-
-        // Initialize both grids to be size*size arrays of Boolean false
-        const row: Array<boolean> = [];
-        for (let i = 0; i < this.size; i++) {
-            row.push(false);
-        }
-        for (let i = 0; i < this.size; i++) {
-            this.modules.push(row.slice());  // Initially all light
-            this.isFunction.push(row.slice());
-        }
-
-        // Compute ECC, draw modules
-        this.drawFunctionPatterns();
-        const allCodewords: Array<byte> = this.addEccAndInterleave(dataCodewords);
-        this.drawCodewords(allCodewords);
-
-        // Do masking
-        if (msk === -1) {  // Automatically choose best mask
-            let minPenalty: int = 1000000000;
-            for (let i = 0; i < 8; i++) {
-                this.applyMask(i);
-                this.drawFormatBits(i);
-                const penalty: int = this.getPenaltyScore();
-                if (penalty < minPenalty) {
-                    msk = i;
-                    minPenalty = penalty;
-                }
-                this.applyMask(i);  // Undoes the mask due to XOR
-            }
-        }
-        assert(0 <= msk && msk <= 7);
-        this.mask = msk;
-        this.applyMask(msk);  // Apply the final choice of mask
-        this.drawFormatBits(msk);  // Overwrite old format bits
-
-        this.isFunction = [];
-    }
-
-    /*-- Constants and tables --*/
-    // The minimum version number supported in the QR Code Model 2 standard.
-    public static readonly MIN_VERSION: int = 1;
-    // The maximum version number supported in the QR Code Model 2 standard.
-    public static readonly MAX_VERSION: int = 40;
 
     // For use in getPenaltyScore(), when evaluating which mask is best.
     private static readonly PENALTY_N1: int = 3;
@@ -122,38 +58,134 @@ export class QrCode {
 
     private static readonly ECC_CODEWORDS_PER_BLOCK: Array<Array<int>> = [
         // Version: (note that index 0 is for padding, and is set to an illegal value)
-        // 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40    Error correction level
-        [-1, 7, 10, 15, 20, 26, 18, 20, 24, 30, 18, 20, 24, 26, 30, 22, 24, 28, 30, 28, 28, 28, 28, 30, 30, 26, 28, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],  // Low
-        [-1, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26, 30, 22, 22, 24, 24, 28, 28, 26, 26, 26, 26, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28],  // Medium
-        [-1, 13, 22, 18, 26, 18, 24, 18, 22, 20, 24, 28, 26, 24, 20, 30, 24, 28, 28, 26, 30, 28, 30, 30, 30, 30, 28, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],  // Quartile
-        [-1, 17, 28, 22, 16, 22, 28, 26, 26, 24, 28, 24, 28, 22, 24, 24, 30, 28, 28, 26, 28, 30, 24, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],  // High
+        // 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
+        // 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40    Error correction level
+        [-1, 7, 10, 15, 20, 26, 18, 20, 24, 30, 18, 20, 24, 26, 30, 22, 24, 28, 30, 28, 28, 28, 28, 30, 30, 26, 28,
+            30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],  // Low
+        [-1, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26, 30, 22, 22, 24, 24, 28, 28, 26, 26, 26, 26, 28, 28, 28, 28, 28,
+            28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28],  // Medium
+        [-1, 13, 22, 18, 26, 18, 24, 18, 22, 20, 24, 28, 26, 24, 20, 30, 24, 28, 28, 26, 30, 28, 30, 30, 30, 30, 28,
+            30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],  // Quartile
+        [-1, 17, 28, 22, 16, 22, 28, 26, 26, 24, 28, 24, 28, 22, 24, 24, 30, 28, 28, 26, 28, 30, 24, 30, 30, 30, 30,
+            30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],  // High
     ];
 
     private static readonly NUM_ERROR_CORRECTION_BLOCKS: Array<Array<int>> = [
         // Version: (note that index 0 is for padding, and is set to an illegal value)
-        // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40    Error correction level
-        [-1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 4, 4, 4, 4, 4, 6, 6, 6, 6, 7, 8, 8, 9, 9, 10, 12, 12, 12, 13, 14, 15, 16, 17, 18, 19, 19, 20, 21, 22, 24, 25],  // Low
-        [-1, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5, 5, 8, 9, 9, 10, 10, 11, 13, 14, 16, 17, 17, 18, 20, 21, 23, 25, 26, 28, 29, 31, 33, 35, 37, 38, 40, 43, 45, 47, 49],  // Medium
-        [-1, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8, 8, 10, 12, 16, 12, 17, 16, 18, 21, 20, 23, 23, 25, 27, 29, 34, 34, 35, 38, 40, 43, 45, 48, 51, 53, 56, 59, 62, 65, 68],  // Quartile
-        [-1, 1, 1, 2, 4, 4, 4, 5, 6, 8, 8, 11, 11, 16, 16, 18, 16, 19, 21, 25, 25, 25, 34, 30, 32, 35, 37, 40, 42, 45, 48, 51, 54, 57, 60, 63, 66, 70, 74, 77, 81],  // High
+        // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+        // 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40    Error correction level
+        [-1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 4, 4, 4, 4, 4, 6, 6, 6, 6, 7, 8, 8, 9, 9, 10, 12, 12, 12, 13, 14, 15, 16, 17,
+            18, 19, 19, 20, 21, 22, 24, 25],  // Low
+        [-1, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5, 5, 8, 9, 9, 10, 10, 11, 13, 14, 16, 17, 17, 18, 20, 21, 23, 25, 26, 28, 29,
+            31, 33, 35, 37, 38, 40, 43, 45, 47, 49],  // Medium
+        [-1, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8, 8, 10, 12, 16, 12, 17, 16, 18, 21, 20, 23, 23, 25, 27, 29, 34, 34, 35, 38,
+            40, 43, 45, 48, 51, 53, 56, 59, 62, 65, 68],  // Quartile
+        [-1, 1, 1, 2, 4, 4, 4, 5, 6, 8, 8, 11, 11, 16, 16, 18, 16, 19, 21, 25, 25, 25, 34, 30, 32, 35, 37, 40, 42, 45,
+            48, 51, 54, 57, 60, 63, 66, 70, 74, 77, 81],  // High
     ];
 
-    /*-- Fields --*/
-    // The width and height of this QR Code, measured in modules, between
-    // 21 and 177 (inclusive). This is equal to version * 4 + 17.
-    public readonly size: int;
+    /*-- Constants and tables --*/
+    // The minimum version number supported in the QR Code Model 2 standard.
+    public static readonly MIN_VERSION: int = 1;
+    // The maximum version number supported in the QR Code Model 2 standard.
+    public static readonly MAX_VERSION: int = 40;
 
-    // The index of the mask pattern used in this QR Code, which is between 0 and 7 (inclusive).
-    // Even if a QR Code is created with automatic masking requested (mask = -1),
-    // the resulting object still has a mask value between 0 and 7.
-    public readonly mask: int;
 
-    // The modules of this QR Code (false = light, true = dark).
-    // Immutable after constructor finishes. Accessed through getModule().
-    private readonly modules: Array<Array<boolean>> = [];
+    // Returns the number of data bits that can be stored in a QR Code of the given version number, after
+    // all function modules are excluded. This includes remainder bits, so it might not be a multiple of 8.
+    // The result is in the range [208, 29648]. This could be implemented as a 40-entry lookup table.
+    @Memoize()
+    private static getNumRawDataModules (ver: int): int {
+        if (ver < QrCode.MIN_VERSION || ver > QrCode.MAX_VERSION) {
+            throw new Error('Version number out of range');
+        }
+        let result: int = (16 * ver + 128) * ver + 64;
+        if (ver >= 2) {
+            const numAlign: int = Math.floor(ver / 7) + 2;
+            result -= (25 * numAlign - 10) * numAlign - 55;
+            if (ver >= 7) {
+                result -= 36;
+            }
+        }
+        assert(208 <= result && result <= 29648);
+        return result;
+    }
 
-    // Indicates function modules that are not subjected to masking. Discarded when constructor finishes.
-    private readonly isFunction: Array<Array<boolean>> = [];
+
+    // Returns the number of 8-bit data (i.e. not error correction) codewords contained in any
+    // QR Code of the given version number and error correction level, with remainder bits discarded.
+    // This stateless pure function could be implemented as a (40*4)-cell lookup table.
+
+    private static getNumDataCodewords (ver: int, ecl: Ecc): int {
+        return Math.floor(QrCode.getNumRawDataModules(ver) / 8) -
+            QrCode.ECC_CODEWORDS_PER_BLOCK    [ecl.ordinal][ver] *
+            QrCode.NUM_ERROR_CORRECTION_BLOCKS[ecl.ordinal][ver];
+    }
+
+
+    // Returns a Reed-Solomon ECC generator polynomial for the given degree. This could be
+    // implemented as a lookup table over all possible parameter values, instead of as an algorithm.
+    @Memoize()
+    private static reedSolomonComputeDivisor (degree: int): Array<byte> {
+        if (degree < 1 || degree > 255) {
+            throw new Error('Degree out of range');
+        }
+        // Polynomial coefficients are stored from highest to lowest power, excluding the leading term which is always 1.
+        // For example the polynomial x^3 + 255x^2 + 8x + 93 is stored as the uint8 array [255, 8, 93].
+        const result: Array<byte> = [];
+        for (let i = 0; i < degree - 1; i++) {
+            result.push(0);
+        }
+        result.push(1);  // Start off with the monomial x^0
+
+        // Compute the product polynomial (x - r^0) * (x - r^1) * (x - r^2) * ... * (x - r^{degree-1}),
+        // and drop the highest monomial term which is always 1x^degree.
+        // Note that r = 0x02, which is a generator element of this field GF(2^8/0x11D).
+        let root = 1;
+        for (let i = 0; i < degree; i++) {
+            // Multiply the current product by (x - r^i)
+            for (let j = 0; j < result.length; j++) {
+                result[j] = QrCode.reedSolomonMultiply(result[j], root);
+                if (j + 1 < result.length) {
+                    result[j] ^= result[j + 1];
+                }
+            }
+            root = QrCode.reedSolomonMultiply(root, 0x02);
+        }
+        return result;
+    }
+
+
+    // Returns the Reed-Solomon error correction codeword for the given data and divisor polynomials.
+
+    private static reedSolomonComputeRemainder (data: Readonly<Array<byte>>, divisor: Readonly<Array<byte>>): Array<byte> {
+        const result: Array<byte> = divisor.map(_ => 0);
+        for (const b of data) {  // Polynomial division
+            const factor: byte = b ^ (result.shift() as byte);
+            result.push(0);
+            divisor.forEach((coef, i) =>
+                result[i] ^= QrCode.reedSolomonMultiply(coef, factor));
+        }
+        return result;
+    }
+
+
+    // Returns the product of the two given field elements modulo GF(2^8/0x11D). The arguments and result
+    // are unsigned 8-bit integers. This could be implemented as a lookup table of 256*256 entries of uint8.
+
+    private static reedSolomonMultiply (x: byte, y: byte): byte {
+        if (x >>> 8 !== 0 || y >>> 8 !== 0) {
+            throw new Error('Byte out of range');
+        }
+        // Russian peasant multiplication
+        let z: int = 0;
+        for (let i = 7; i >= 0; i--) {
+            z = (z << 1) ^ ((z >>> 7) * 0x11D);
+            z ^= ((y >>> i) & 1) * x;
+        }
+        assert(z >>> 8 === 0);
+        return z as byte;
+    }
 
     /*-- Static factory functions (high level) --*/
     // Returns a QR Code representing the given Unicode text string at the given error correction level.
@@ -252,96 +284,81 @@ export class QrCode {
         return new QrCode(version, ecl, dataCodewords, mask);
     }
 
+    // The modules of this QR Code (false = light, true = dark).
+    // Immutable after constructor finishes. Accessed through getModule().
+    private readonly modules: Array<Array<boolean>> = [];
 
-    // Returns the number of data bits that can be stored in a QR Code of the given version number, after
-    // all function modules are excluded. This includes remainder bits, so it might not be a multiple of 8.
-    // The result is in the range [208, 29648]. This could be implemented as a 40-entry lookup table.
-    private static getNumRawDataModules (ver: int): int {
-        if (ver < QrCode.MIN_VERSION || ver > QrCode.MAX_VERSION) {
-            throw new Error('Version number out of range');
+    // Indicates function modules that are not subjected to masking. Discarded when constructor finishes.
+    private readonly isFunction: Array<Array<boolean>> = [];
+
+    /*-- Fields --*/
+    // The width and height of this QR Code, measured in modules, between
+    // 21 and 177 (inclusive). This is equal to version * 4 + 17.
+    public readonly size: int;
+
+    // The index of the mask pattern used in this QR Code, which is between 0 and 7 (inclusive).
+    // Even if a QR Code is created with automatic masking requested (mask = -1),
+    // the resulting object still has a mask value between 0 and 7.
+    public readonly mask: int;
+    /*-- Constructor (low level) and fields --*/
+
+    // Creates a new QR Code with the given version number,
+    // error correction level, data codeword bytes, and mask number.
+    // This is a low-level API that most users should not use directly.
+    // A mid-level API is the encodeSegments() function.
+    public constructor (
+        // The version number of this QR Code, which is between 1 and 40 (inclusive).
+        // This determines the size of this barcode.
+        public readonly version: int,
+        // The error correction level used in this QR Code.
+        public readonly errorCorrectionLevel: Ecc,
+        dataCodewords: Readonly<Array<byte>>,
+        msk: int) {
+
+        // Check scalar arguments
+        if (version < QrCode.MIN_VERSION || version > QrCode.MAX_VERSION) {
+            throw new Error('Version value out of range');
         }
-        let result: int = (16 * ver + 128) * ver + 64;
-        if (ver >= 2) {
-            const numAlign: int = Math.floor(ver / 7) + 2;
-            result -= (25 * numAlign - 10) * numAlign - 55;
-            if (ver >= 7) {
-                result -= 36;
-            }
+        if (msk < -1 || msk > 7) {
+            throw new Error('Mask value out of range');
         }
-        assert(208 <= result && result <= 29648);
-        return result;
-    }
+        this.size = version * 4 + 17;
 
-
-    // Returns the number of 8-bit data (i.e. not error correction) codewords contained in any
-    // QR Code of the given version number and error correction level, with remainder bits discarded.
-    // This stateless pure function could be implemented as a (40*4)-cell lookup table.
-    private static getNumDataCodewords (ver: int, ecl: Ecc): int {
-        return Math.floor(QrCode.getNumRawDataModules(ver) / 8) -
-            QrCode.ECC_CODEWORDS_PER_BLOCK    [ecl.ordinal][ver] *
-            QrCode.NUM_ERROR_CORRECTION_BLOCKS[ecl.ordinal][ver];
-    }
-
-
-    // Returns a Reed-Solomon ECC generator polynomial for the given degree. This could be
-    // implemented as a lookup table over all possible parameter values, instead of as an algorithm.
-    private static reedSolomonComputeDivisor (degree: int): Array<byte> {
-        if (degree < 1 || degree > 255) {
-            throw new Error('Degree out of range');
+        // Initialize both grids to be size*size arrays of Boolean false
+        const row: Array<boolean> = [];
+        for (let i = 0; i < this.size; i++) {
+            row.push(false);
         }
-        // Polynomial coefficients are stored from highest to lowest power, excluding the leading term which is always 1.
-        // For example the polynomial x^3 + 255x^2 + 8x + 93 is stored as the uint8 array [255, 8, 93].
-        const result: Array<byte> = [];
-        for (let i = 0; i < degree - 1; i++) {
-            result.push(0);
+        for (let i = 0; i < this.size; i++) {
+            this.modules.push(row.slice());  // Initially all light
+            this.isFunction.push(row.slice());
         }
-        result.push(1);  // Start off with the monomial x^0
 
-        // Compute the product polynomial (x - r^0) * (x - r^1) * (x - r^2) * ... * (x - r^{degree-1}),
-        // and drop the highest monomial term which is always 1x^degree.
-        // Note that r = 0x02, which is a generator element of this field GF(2^8/0x11D).
-        let root = 1;
-        for (let i = 0; i < degree; i++) {
-            // Multiply the current product by (x - r^i)
-            for (let j = 0; j < result.length; j++) {
-                result[j] = QrCode.reedSolomonMultiply(result[j], root);
-                if (j + 1 < result.length) {
-                    result[j] ^= result[j + 1];
+        // Compute ECC, draw modules
+        this.drawFunctionPatterns();
+        const allCodewords: Array<byte> = this.addEccAndInterleave(dataCodewords);
+        this.drawCodewords(allCodewords);
+
+        // Do masking
+        if (msk === -1) {  // Automatically choose best mask
+            let minPenalty: int = 1000000000;
+            for (let i = 0; i < 8; i++) {
+                this.applyMask(i);
+                this.drawFormatBits(i);
+                const penalty: int = this.getPenaltyScore();
+                if (penalty < minPenalty) {
+                    msk = i;
+                    minPenalty = penalty;
                 }
+                this.applyMask(i);  // Undoes the mask due to XOR
             }
-            root = QrCode.reedSolomonMultiply(root, 0x02);
         }
-        return result;
-    }
+        assert(0 <= msk && msk <= 7);
+        this.mask = msk;
+        this.applyMask(msk);  // Apply the final choice of mask
+        this.drawFormatBits(msk);  // Overwrite old format bits
 
-
-    // Returns the Reed-Solomon error correction codeword for the given data and divisor polynomials.
-    private static reedSolomonComputeRemainder (data: Readonly<Array<byte>>, divisor: Readonly<Array<byte>>): Array<byte> {
-        const result: Array<byte> = divisor.map(_ => 0);
-        for (const b of data) {  // Polynomial division
-            const factor: byte = b ^ (result.shift() as byte);
-            result.push(0);
-            divisor.forEach((coef, i) =>
-                result[i] ^= QrCode.reedSolomonMultiply(coef, factor));
-        }
-        return result;
-    }
-
-
-    // Returns the product of the two given field elements modulo GF(2^8/0x11D). The arguments and result
-    // are unsigned 8-bit integers. This could be implemented as a lookup table of 256*256 entries of uint8.
-    private static reedSolomonMultiply (x: byte, y: byte): byte {
-        if (x >>> 8 !== 0 || y >>> 8 !== 0) {
-            throw new Error('Byte out of range');
-        }
-        // Russian peasant multiplication
-        let z: int = 0;
-        for (let i = 7; i >= 0; i--) {
-            z = (z << 1) ^ ((z >>> 7) * 0x11D);
-            z ^= ((y >>> i) & 1) * x;
-        }
-        assert(z >>> 8 === 0);
-        return z as byte;
+        this.isFunction = [];
     }
 
 
@@ -786,28 +803,6 @@ function assert (cond: boolean): void {
 export class QrSegment {
 
 
-    /*-- Constructor (low level) and fields --*/
-
-    // Creates a new QR Code segment with the given attributes and data.
-    // The character count (numChars) must agree with the mode and the bit buffer length,
-    // but the constraint isn't checked. The given bit buffer is cloned and stored.
-    public constructor (
-        // The mode indicator of this segment.
-        public readonly mode: Mode,
-        // The length of this segment's unencoded data. Measured in characters for
-        // numeric/alphanumeric/kanji mode, bytes for byte mode, and 0 for ECI mode.
-        // Always zero or positive. Not the same as the data's bit length.
-        public readonly numChars: int,
-        // The data bits of this segment. Accessed through getData().
-        private readonly bitData: Array<bit>) {
-
-        if (numChars < 0) {
-            throw new Error('Invalid argument');
-        }
-        this.bitData = bitData.slice();  // Make defensive copy
-    }
-
-
     /*-- Constants --*/
 
     // Describes precisely all strings that are encodable in numeric mode.
@@ -819,6 +814,22 @@ export class QrSegment {
     // The set of all legal characters in alphanumeric mode,
     // where each character value maps to the index in the string.
     private static readonly ALPHANUMERIC_CHARSET: string = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
+
+
+    // Returns a new array of bytes representing the given string encoded in UTF-8.
+    private static toUtf8ByteArray (str: string): Array<byte> {
+        str = encodeURI(str);
+        const result: Array<byte> = [];
+        for (let i = 0; i < str.length; i++) {
+            if (str.charAt(i) !== '%') {
+                result.push(str.charCodeAt(i));
+            } else {
+                result.push(parseInt(str.substr(i + 1, 2), 16));
+                i += 2;
+            }
+        }
+        return result;
+    }
 
     /*-- Static factory functions (mid level) --*/
 
@@ -937,19 +948,25 @@ export class QrSegment {
     }
 
 
-    // Returns a new array of bytes representing the given string encoded in UTF-8.
-    private static toUtf8ByteArray (str: string): Array<byte> {
-        str = encodeURI(str);
-        const result: Array<byte> = [];
-        for (let i = 0; i < str.length; i++) {
-            if (str.charAt(i) !== '%') {
-                result.push(str.charCodeAt(i));
-            } else {
-                result.push(parseInt(str.substr(i + 1, 2), 16));
-                i += 2;
-            }
+    /*-- Constructor (low level) and fields --*/
+
+    // Creates a new QR Code segment with the given attributes and data.
+    // The character count (numChars) must agree with the mode and the bit buffer length,
+    // but the constraint isn't checked. The given bit buffer is cloned and stored.
+    public constructor (
+        // The mode indicator of this segment.
+        public readonly mode: Mode,
+        // The length of this segment's unencoded data. Measured in characters for
+        // numeric/alphanumeric/kanji mode, bytes for byte mode, and 0 for ECI mode.
+        // Always zero or positive. Not the same as the data's bit length.
+        public readonly numChars: int,
+        // The data bits of this segment. Accessed through getData().
+        private readonly bitData: Array<bit>) {
+
+        if (numChars < 0) {
+            throw new Error('Invalid argument');
         }
-        return result;
+        this.bitData = bitData.slice();  // Make defensive copy
     }
 
 
@@ -1032,4 +1049,3 @@ export class Mode {
         return this.numBitsCharCount[Math.floor((ver + 7) / 17)];
     }
 }
-

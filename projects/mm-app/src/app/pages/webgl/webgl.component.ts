@@ -188,19 +188,6 @@ export class WebglComponent implements OnInit {
                 this.mouse.y = e.clientY;
             }, 100), {passive: true});
             setTimeout(this._render.bind(this), 0);
-            // setTimeout( () => {
-            //     const recording = this._record(this.renderer.domElement, 10000);
-            //     const video = document.createElement('video');
-            //     document.body.appendChild(video);
-            //     recording.then(url => video.setAttribute('src', url));
-            //
-            //     const link = document.createElement('a');
-            //     link.setAttribute('download', 'recordingVideo');
-            //     recording.then(url => {
-            //         link.setAttribute('href', url);
-            //         link.click();
-            //     });
-            // }, 2500);
         });
     }
 
