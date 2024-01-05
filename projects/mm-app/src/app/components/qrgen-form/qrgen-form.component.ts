@@ -8,7 +8,7 @@ import {
     Output,
     SimpleChanges,
 } from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {FormGroup} from '@angular/forms';
 import {QrCodeObj} from '@mm-lib';
 import {QrGenField, QR_CODE_OPTIONS, QR_GEN_FORM_TYPE} from '@mm-lib/qr';
 import {TuiDestroyService} from '@taiga-ui/cdk';
@@ -44,8 +44,7 @@ export class QrgenFormComponent implements OnChanges {
     public qrGenForm: FormGroup;
     public qrGenFormFields: EntryOf<Record<string, QrGenField>>[] | undefined;
 
-    constructor (
-        private fb: FormBuilder,
+    constructor(
         protected qrgenFormService: QrgenFormService,
         @Inject(QR_CODE_OPTIONS) public qrCode: QrCodeObj,
         @Inject(TuiDestroyService) private readonly destroy$: TuiDestroyService,
@@ -53,7 +52,8 @@ export class QrgenFormComponent implements OnChanges {
         this.qrGenForm = this.qrgenFormService.toForm(this.formConfig);
     }
 
-    ngOnChanges (changes: SimpleChanges): void {
+    ngOnChanges(changes: SimpleChanges): void {
+        console.log(changes, this.formType);
         this.qrGenFormFields = this.objEntries<typeof this.formConfig>(this.formConfig);
         this.qrGenForm = this.qrgenFormService.toForm(this.formConfig);
         this.qrGenData.emit({...this.qrCode, content: this.generateQrCodeContent(this.qrGenForm.getRawValue())});
@@ -67,7 +67,7 @@ export class QrgenFormComponent implements OnChanges {
                     tap(val => {
                         const qrCodeContent = this.generateQrCodeContent(val);
                         const qrConfig = {...this.qrCode};
-                        if (this.formType === QR_GEN_FORM_TYPE.VCard) {
+                        if (changes['formType'].currentValue === QR_GEN_FORM_TYPE.VCard) {
                             qrConfig.size = 8;
                         }
                         this.qrGenData.emit({...this.qrCode, content: qrCodeContent});
@@ -79,9 +79,9 @@ export class QrgenFormComponent implements OnChanges {
         this.formChange.next(true);
     }
 
-    private objEntries = <T extends {}> (obj: T) => Object.entries(obj) as EntriesOf<T>;
+    private objEntries = <T extends {}>(obj: T) => Object.entries(obj) as EntriesOf<T>;
 
-    private generateQrCodeContent (val: Record<string, string | boolean>): string {
+    private generateQrCodeContent(val: Record<string, string | boolean>): string {
         const args = Object.values(val);
         switch (this.formType) {
             case QR_GEN_FORM_TYPE.URL:

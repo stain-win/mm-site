@@ -6,7 +6,7 @@ const pointsPerFrame = 5000;
 const pointsPerLine  = 25;
 
 
-// wether each line has assigned a quantity of points proportional to its length or a fixed number instead
+// whether each line has assigned a quantity of points proportional to its length or a fixed number instead
 const useLengthSampling = false;
 
 export function createLines (): any[] {
