@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, ElementRef, NgZone, OnInit, Renderer2} from '@angular/core';
 import gsap from 'gsap';
-import { clamp, throttle } from 'lodash';
+import { clamp, throttle } from 'lodash-es';
 import {
     AddEquation, Clock,
     Color,

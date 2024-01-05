@@ -12,7 +12,7 @@ import {FormGroup} from '@angular/forms';
 import {QrCodeObj} from '@mm-lib';
 import {QrGenField, QR_CODE_OPTIONS, QR_GEN_FORM_TYPE} from '@mm-lib/qr';
 import {TuiDestroyService} from '@taiga-ui/cdk';
-import mapValues from 'lodash/mapValues';
+import { mapValues } from 'lodash-es';
 
 import {debounceTime, distinctUntilChanged, map, Subject, switchMap, takeUntil, tap} from 'rxjs';
 
@@ -53,7 +53,6 @@ export class QrgenFormComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        console.log(changes, this.formType);
         this.qrGenFormFields = this.objEntries<typeof this.formConfig>(this.formConfig);
         this.qrGenForm = this.qrgenFormService.toForm(this.formConfig);
         this.qrGenData.emit({...this.qrCode, content: this.generateQrCodeContent(this.qrGenForm.getRawValue())});
