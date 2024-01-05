@@ -6,7 +6,6 @@ import {
     Inject,
     NgZone,
 } from '@angular/core';
-import {FormBuilder} from '@angular/forms';
 import {QrCodeObj, QrCodeOutputFormat} from '@mm-lib';
 import {QR_CODE_DOWNLOAD_FORMAT, QR_CODE_OPTIONS, QR_GEN_FORM_TYPE} from '@mm-lib/qr';
 import {TuiDestroyService} from '@taiga-ui/cdk';
@@ -41,7 +40,6 @@ export class QrgenComponent implements AfterViewInit {
         public container: ElementRef,
         protected qrgeneratorService: QrgeneratorService,
         private zone: NgZone,
-        private fb: FormBuilder,
         @Inject(QR_CODE_OPTIONS) public qrCode: QrCodeObj,
         @Inject(TuiDestroyService) private readonly destroy$: TuiDestroyService,
     ) {
