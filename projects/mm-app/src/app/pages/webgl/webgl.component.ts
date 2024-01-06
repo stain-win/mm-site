@@ -6,7 +6,7 @@ import {
     Color,
     CustomBlending,
     DoubleSide, FloatType, Mesh,
-    OneFactor, PerspectiveCamera, PlaneGeometry, Points, PointsMaterial,
+    OneFactor, PerspectiveCamera, PlaneGeometry, Points,
     Scene,
     ShaderMaterial,
     Uniform, Vector3,
@@ -117,6 +117,19 @@ export class WebglComponent implements OnInit {
         this.controls.minPolarAngle   = 0.85;
         this.controls.maxPolarAngle   = Math.PI - 0.85;
         this.controls.enableZoom = false;
+
+        if (typeof Worker !== 'undefined') {
+            // Create a new
+            const worker = new Worker(new URL('./webgl.worker', import.meta.url));
+
+            worker.onmessage = ({ data }) => {
+                console.log(`page got message: ${data}`);
+            };
+            worker.postMessage({lines: this.lines});
+        } else {
+            // Web workers are not supported in this environment.
+            // You should add a fallback so that your program still executes correctly.
+        }
     }
 
     ngOnInit (): void {
