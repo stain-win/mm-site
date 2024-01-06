@@ -53,8 +53,8 @@ export class QrgenFormComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        this.qrGenFormFields = this.objEntries<typeof this.formConfig>(this.formConfig);
-        this.qrGenForm = this.qrgenFormService.toForm(this.formConfig);
+        this.qrGenFormFields = this.objEntries<typeof this.formConfig>(changes['formConfig'].currentValue);
+        this.qrGenForm = this.qrgenFormService.toForm(changes['formConfig'].currentValue);
         this.qrGenData.emit({...this.qrCode, content: this.generateQrCodeContent(this.qrGenForm.getRawValue())});
         this.formChange.pipe(
             switchMap(_ => this.qrGenForm.valueChanges.pipe(

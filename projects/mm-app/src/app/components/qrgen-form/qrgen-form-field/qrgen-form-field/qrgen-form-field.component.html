@@ -40,11 +40,11 @@
                               [formControlName]="fieldName">
             {{field.label}}
         </tui-checkbox-labeled>
-        <tui-text-area *ngSwitchCase="QrGenFieldType.Textarea"
+        <tui-textarea *ngSwitchCase="QrGenFieldType.Textarea"
                        [tuiAutoFocus]="autoFocus"
                        [formControlName]="fieldName">
             {{field.placeholder}}
-        </tui-text-area>
+        </tui-textarea>
         <div *ngSwitchCase="QrGenFieldType.RadioButton" tuiGroup class="group" [collapsed]="true">
             <ng-container *ngFor="let item of field.options">
                 <tui-radio-block size="s" contentAlign="right" [formControlName]="fieldName" [item]="item['value']">
