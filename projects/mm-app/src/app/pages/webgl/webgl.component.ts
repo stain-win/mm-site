@@ -123,7 +123,7 @@ export class WebglComponent implements OnInit {
             const worker = new Worker(new URL('./webgl.worker', import.meta.url));
 
             worker.onmessage = ({ data }) => {
-                console.log(`page got message: ${data}`);
+               //
             };
             worker.postMessage({lines: this.lines});
         } else {
