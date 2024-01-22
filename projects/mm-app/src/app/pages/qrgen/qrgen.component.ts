@@ -38,7 +38,7 @@ export class QrgenComponent implements AfterViewInit {
 
     constructor (
         public container: ElementRef,
-        protected qrgeneratorService: QrgeneratorService,
+        protected qrGeneratorService: QrgeneratorService,
         private zone: NgZone,
         @Inject(QR_CODE_OPTIONS) public qrCode: QrCodeObj,
         @Inject(TuiDestroyService) private readonly destroy$: TuiDestroyService,
@@ -83,11 +83,11 @@ export class QrgenComponent implements AfterViewInit {
     downloadCode ($event: MouseEvent, format: QR_CODE_DOWNLOAD_FORMAT): void {
         switch (format) {
             case QR_CODE_DOWNLOAD_FORMAT.SVG:
-                this.qrgeneratorService.downloadQrSVG(this.qrCode).subscribe();
+                this.qrGeneratorService.downloadQrSVG(this.qrCode).subscribe();
                 break;
             case QR_CODE_DOWNLOAD_FORMAT.PNG:
             default:
-                this.qrgeneratorService.downloadQrPng(this.qrCode).subscribe();
+                this.qrGeneratorService.downloadQrPng(this.qrCode).subscribe();
                 break;
         }
     }

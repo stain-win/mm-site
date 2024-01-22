@@ -2,7 +2,7 @@ import {InjectionToken} from '@angular/core';
 
 export enum QR_GENERATOR_ENGINE {
     Client = 'client',
-    Server = 'cerver',
+    Server = 'server',
 }
 export interface BootstrapConfig {
     grGeneratorEngine: QR_GENERATOR_ENGINE;
