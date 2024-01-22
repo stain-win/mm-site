@@ -14,7 +14,7 @@ import {
     WebGLRenderer, WebGLRenderTarget,
 } from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
-import {createLines, createLinesGeometry} from '../../utils/createLines';
+import {createLines, createLinesGeometry, DofLine} from '../../utils/createLines';
 import linef from '../../utils/shaders/linef.glsl';
 import linev from '../../utils/shaders/linev.glsl';
 import postprocf from '../../utils/shaders/postprocf.glsl';
@@ -53,7 +53,7 @@ export class WebglComponent implements OnInit {
     controls = new OrbitControls(this.camera, this.renderer.domElement);
     clock = new Clock();
 
-    lines = createLines();
+    lines: DofLine[] = createLines();
     linesGeometry = createLinesGeometry(this.lines);
 
     linesMaterial = new ShaderMaterial({
@@ -120,7 +120,7 @@ export class WebglComponent implements OnInit {
 
         if (typeof Worker !== 'undefined') {
             // Create a new
-            const worker = new Worker(new URL('./webgl.worker', import.meta.url));
+            const worker = new Worker(new URL('./webgl.worker', import .meta.url));
 
             worker.onmessage = ({ data }) => {
                //
@@ -187,7 +187,7 @@ export class WebglComponent implements OnInit {
                 );
 
                 // this.camera.position.z += 1;
-                this.camera.fov -= 1 * Math.sign(e.deltaY);
+                this.camera.fov -= Math.sign(e.deltaY);
                 // if (this.cameraFocalDistance > 50) {
                     // this.linesMesh.visible = false;
                     // this.linesMesh.position.z -= 5;
@@ -265,7 +265,7 @@ export class WebglComponent implements OnInit {
 
             mediaRecorder.ondataavailable =  (event) => {
                 recordedChunks.push(event.data);
-                // after stop `dataavilable` event run one more time
+                // after stop `dataAvailable` event run one more time
                 if (mediaRecorder.state === 'recording') {
                     mediaRecorder.stop();
                 }

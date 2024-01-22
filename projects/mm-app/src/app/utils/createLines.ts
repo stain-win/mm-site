@@ -1,29 +1,43 @@
-import * as THREE from 'three';
-import {BufferGeometry} from 'three';
+import {BufferGeometry, Color, Float32BufferAttribute, Vector3} from 'three';
 import {curlNoise} from './curlNoise';
 
 const pointsPerFrame = 5000;
 const pointsPerLine  = 25;
+const nrings = 32;
+const trad = 5;
+const t = 1;
 
 
 // whether each line has assigned a quantity of points proportional to its length or a fixed number instead
 const useLengthSampling = false;
 
-export function createLines (): any[] {
-    const nrings = 32;
-    const lines = [];
+export interface DofLine {
+    x1: number;
+    y1: number;
+    z1: number;
+    x2: number;
+    y2: number;
+    z2: number;
+    c1r: number;
+    c1g: number;
+    c1b: number;
+    c2r: number;
+    c2g: number;
+    c2b: number;
+    weight?: number;
+}
+
+export function createLines (): DofLine[] {
+    const lines: DofLine[] = [];
 
     for (let j = 0; j < nrings; j++) {
         const color = [0, .003, .009];
         const angle = (j / nrings) * Math.PI / (Math.random() * (4 - 2) + 2);
-        const p = new THREE.Vector3(0, 0, 1);
-        p.applyAxisAngle(new THREE.Vector3(2, 1, -1), angle);
+        const p = new Vector3(0, 0, 1);
+        p.applyAxisAngle(new Vector3(2, 1, -1), angle);
 
         const rad = p.y;
         const z   = p.z;
-
-        const trad = 5;
-        // const trad = 3.5;
 
         const nsegments = 70 + Math.abs(Math.floor(rad * 360));
         const noiseSpeed = Math.random();
@@ -45,38 +59,36 @@ export function createLines (): any[] {
 
             const noiseStrength1 =
                 0.1 + curlNoise(
-                    new THREE.Vector3(x1 * noiseSpeed * 0.3, y1 * noiseSpeed * 0.3, z1 * noiseSpeed * 0.3))
+                    new Vector3(x1 * noiseSpeed * 0.3, y1 * noiseSpeed * 0.3, z1 * noiseSpeed * 0.3))
                     .x * 0.7;
             const noiseStrength2 =
                 0.1 + curlNoise(
-                    new THREE.Vector3(x2 * noiseSpeed * 0.3, y2 * noiseSpeed * 0.3, z2 * noiseSpeed * 0.3))
+                    new Vector3(x2 * noiseSpeed * 0.3, y2 * noiseSpeed * 0.3, z2 * noiseSpeed * 0.3))
                     .x * 0.7;
-            const v1 =
-                curlNoise(new THREE.Vector3(x1 * noiseSpeed, y1 * noiseSpeed, z1 * noiseSpeed))
+            const v1: Vector3 =
+                curlNoise(new Vector3(x1 * noiseSpeed, y1 * noiseSpeed, z1 * noiseSpeed))
                     .multiplyScalar(noiseStrength1);
-            const v2 =
-                curlNoise(new THREE.Vector3(x2 * noiseSpeed, y2 * noiseSpeed, z2 * noiseSpeed))
+            const v2: Vector3 =
+                curlNoise(new Vector3(x2 * noiseSpeed, y2 * noiseSpeed, z2 * noiseSpeed))
                     .multiplyScalar(noiseStrength2);
 
             let colorMult = .1;
             let colorMult2 = 0.1;
 
 
-            const ldir = new THREE.Vector3(-0.2, -0.35, -0.5);
-            ldir.normalize();
-            ldir.multiplyScalar(-1);
+            const lDir = new Vector3(-0.2, -0.35, -0.5);
+            lDir.normalize();
+            lDir.multiplyScalar(-1);
 
-            const normal = new THREE.Vector3(x1, y1, z1);
+            const normal = new Vector3(x1, y1, z1);
             normal.normalize();
 
-            const diffuse1 = Math.pow(Math.max(normal.dot(ldir), 0.0), 3.0);
-            const diffuse2 = Math.pow(Math.max(normal.dot(ldir), 0.0), 1.5);
+            const diffuse1 = Math.pow(Math.max(normal.dot(lDir), 0.0), 3.0);
+            const diffuse2 = Math.pow(Math.max(normal.dot(lDir), 0.0), 1.5);
             colorMult *= diffuse1;
             colorMult2 *= diffuse2;
             colorMult += 0.002;
             colorMult2 += 0.002;
-
-            const t = 1;
 
             if (Math.random() > 0.975) {
 
@@ -132,7 +144,7 @@ export function createLines (): any[] {
 
 export function createLinesGeometry (lines: string | any[]): BufferGeometry {
 
-    const geometry = new THREE.BufferGeometry();
+    const geometry = new BufferGeometry();
     const position1 = [];
     const position2 = [];
     const color1 = [];
@@ -191,7 +203,7 @@ export function createLinesGeometry (lines: string | any[]): BufferGeometry {
             points = Math.max(  Math.floor(pointsPerUnit * lineLength * weight), 1  );
             invPointsPerLine = 1 / points;
         }
-        const color = new THREE.Color();
+        const color = new Color();
         for (let ppr = 0; ppr < points; ppr++) {
             position1.push(lx1, ly1, lz1);
             position2.push(lx2, ly2, lz2);
@@ -203,11 +215,11 @@ export function createLinesGeometry (lines: string | any[]): BufferGeometry {
         }
     }
 
-    geometry.setAttribute( 'position',  new THREE.Float32BufferAttribute( new Float32Array(position1), 3 ) );
-    geometry.setAttribute( 'position1', new THREE.Float32BufferAttribute( new Float32Array(position2), 3 ) );
-    geometry.setAttribute( 'color1',    new THREE.Float32BufferAttribute( new Float32Array(color1), 3 ) );
-    geometry.setAttribute( 'color2',    new THREE.Float32BufferAttribute( new Float32Array(color2), 3 ) );
-    geometry.setAttribute( 'aSeed',     new THREE.Float32BufferAttribute( new Float32Array(seed), 4 ) );
+    geometry.setAttribute( 'position',  new Float32BufferAttribute( new Float32Array(position1), 3 ) );
+    geometry.setAttribute( 'position1', new Float32BufferAttribute( new Float32Array(position2), 3 ) );
+    geometry.setAttribute( 'color1',    new Float32BufferAttribute( new Float32Array(color1), 3 ) );
+    geometry.setAttribute( 'color2',    new Float32BufferAttribute( new Float32Array(color2), 3 ) );
+    geometry.setAttribute( 'aSeed',     new Float32BufferAttribute( new Float32Array(seed), 4 ) );
 
     return geometry;
 }

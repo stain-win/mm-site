@@ -2,7 +2,7 @@ import {createNoise3D} from 'simplex-noise';
 import {Vector3} from 'three';
 
 const noise = createNoise3D();
-
+const e = 0.1;
 export function noise3 ( px: number, py: number, pz: number): Vector3 {
     const rv = new Vector3();
 
@@ -18,8 +18,6 @@ export function noise3 ( px: number, py: number, pz: number): Vector3 {
 }
 
 export function curlNoise ( p: Vector3): Vector3 {
-    const e = 0.1;
-
     const dx = new Vector3(e, 0, 0);
     const dy = new Vector3(0, e, 0);
     const dz = new Vector3(0, 0, e);
