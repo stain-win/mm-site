@@ -16,7 +16,7 @@ import { mapValues } from 'lodash-es';
 
 import {debounceTime, distinctUntilChanged, map, Subject, switchMap, takeUntil, tap} from 'rxjs';
 
-import {EntriesOf, EntryOf} from '../../types/utils';
+import {EntriesOf, EntryOf, SpreadParamsOfType} from '../../types/utils';
 import {
     generateEmailContent, generateSmsContent,
     generateUrlContent,
@@ -25,6 +25,7 @@ import {
 } from '../../utils/qr-content-generator';
 import {defaultFormConf} from './qrgen-form-conf';
 import {QrgenFormService} from './qrgen-form.service';
+import {QrGenFormWifi} from '../../../../../mm-lib/src/lib/qr';
 
 @Component({
     selector: 'mm-qrgen-form',
@@ -44,7 +45,7 @@ export class QrgenFormComponent implements OnChanges {
     public qrGenForm: FormGroup;
     public qrGenFormFields: EntryOf<Record<string, QrGenField>>[] | undefined;
 
-    constructor(
+    constructor (
         protected qrgenFormService: QrgenFormService,
         @Inject(QR_CODE_OPTIONS) public qrCode: QrCodeObj,
         @Inject(TuiDestroyService) private readonly destroy$: TuiDestroyService,
@@ -52,7 +53,7 @@ export class QrgenFormComponent implements OnChanges {
         this.qrGenForm = this.qrgenFormService.toForm(this.formConfig);
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
+    ngOnChanges (changes: SimpleChanges): void {
         this.qrGenFormFields = this.objEntries<typeof this.formConfig>(changes['formConfig'].currentValue);
         this.qrGenForm = this.qrgenFormService.toForm(changes['formConfig'].currentValue);
         this.qrGenData.emit({...this.qrCode, content: this.generateQrCodeContent(this.qrGenForm.getRawValue())});
@@ -80,27 +81,21 @@ export class QrgenFormComponent implements OnChanges {
 
     private objEntries = <T extends {}>(obj: T) => Object.entries(obj) as EntriesOf<T>;
 
-    private generateQrCodeContent(val: Record<string, string | boolean>): string {
+    private generateQrCodeContent (val: Record<string, string | boolean>): string {
         const args = Object.values(val);
         switch (this.formType) {
             case QR_GEN_FORM_TYPE.URL:
-                // @ts-ignore
-                return generateUrlContent(...args);
+                return generateUrlContent(args[0] as string);
             case QR_GEN_FORM_TYPE.Wifi:
-                // @ts-ignore
-                return generateWifiContent(...args);
+                return generateWifiContent(...args as SpreadParamsOfType<typeof generateWifiContent>);
             case QR_GEN_FORM_TYPE.VCard:
-                // @ts-ignore
-                return generateVCardContent(...args);
+                return generateVCardContent(...args as SpreadParamsOfType<typeof generateVCardContent>);
             case QR_GEN_FORM_TYPE.Email:
-                // @ts-ignore
-                return generateEmailContent(...args);
+                return generateEmailContent(...args as SpreadParamsOfType<typeof generateEmailContent>);
             case QR_GEN_FORM_TYPE.SMS:
-                // @ts-ignore
-                return generateSmsContent(...args);
+                return generateSmsContent(...args as SpreadParamsOfType<typeof generateSmsContent>);
             default:
-                // @ts-ignore
-                return generateUrlContent(...args);
+                return generateUrlContent(args[0] as string);
         }
     }
 }

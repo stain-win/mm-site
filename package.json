@@ -1,6 +1,9 @@
 {
   "name": "mm-site",
   "version": "0.0.0",
+  "engines": {
+    "node": ">=18.17.0"
+  },
   "scripts": {
     "ng": "ng",
     "ngver": "ng version",
@@ -40,7 +43,7 @@
     "raw-loader": "^4.0.2",
     "rxjs": "~7.5.0",
     "simplex-noise": "^4.0.0",
-    "three": "^0.153.0",
+    "three": "^0.161.0",
     "tslib": "^2.3.0",
     "typescript-memoize": "^1.1.1",
     "zone.js": "^0.14.2"

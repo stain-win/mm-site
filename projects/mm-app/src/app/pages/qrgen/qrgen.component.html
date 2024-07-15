@@ -31,7 +31,8 @@
             </div>
             <!-- Col -->
             <div class="qrgen-cols__form">
-                <mm-qrgen-navigation (itemClick)="setQrGenFormType($event)"></mm-qrgen-navigation>
+                <mm-qrgen-navigation (itemClick)="setQrGenFormType($event)">
+                </mm-qrgen-navigation>
                 <mm-qrgen-form (qrGenData)="drawCode($event)" [formType]="formType" [formConfig]="formConfig">
                 </mm-qrgen-form>
                 <!--        </form>-->

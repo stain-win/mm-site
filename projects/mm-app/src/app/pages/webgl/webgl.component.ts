@@ -97,7 +97,7 @@ export class WebglComponent implements OnInit {
     });
     postProcMesh = new Mesh(this.postProcQuadGeo, this.postProcQuadMaterial);
 
-    constructor (private el: ElementRef,
+    constructor (private el: ElementRef<HTMLElement>,
                  private zone: NgZone,
                  private renderer2: Renderer2) {
         this.renderer.setSize(SIZES.width, SIZES.height);
