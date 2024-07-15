@@ -84,10 +84,10 @@
           "builder": "@angular-builders/custom-webpack:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "mm-app:build:production"
+              "buildTarget": "mm-app:build:production"
             },
             "development": {
-              "browserTarget": "mm-app:build:development"
+              "buildTarget": "mm-app:build:development"
             }
           },
           "defaultConfiguration": "development"

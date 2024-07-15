@@ -31,18 +31,20 @@ import { QrCode, QrSegment} from '../../utils/qrcode';
 export class QrgenComponent implements AfterViewInit {
     protected readonly QR_CODE_DOWNLOAD_FORMAT = QR_CODE_DOWNLOAD_FORMAT;
 
-    public svg: any;
-    public canvas: any;
+    public svg: Element | null;
+    public canvas: HTMLCanvasElement | null;
     public formType = QR_GEN_FORM_TYPE.URL;
     public formConfig = urlFormConf;
 
     constructor (
-        public container: ElementRef,
+        public container: ElementRef<HTMLElement>,
         protected qrGeneratorService: QrgeneratorService,
         private zone: NgZone,
         @Inject(QR_CODE_OPTIONS) public qrCode: QrCodeObj,
         @Inject(TuiDestroyService) private readonly destroy$: TuiDestroyService,
     ) {
+        this.svg = null;
+        this.canvas = null;
     }
 
     setQrGenFormType (option: QR_GEN_FORM_TYPE): void {
@@ -118,6 +120,7 @@ export class QrgenComponent implements AfterViewInit {
         const viewBox: string = (/ viewBox="([^"]*)"/.exec(code) as RegExpExecArray)[1];
         const pathD: string = (/ d="([^"]*)"/.exec(code) as RegExpExecArray)[1];
         this.zone.runOutsideAngular(() => {
+            if ( this.svg === null) { return; }
             this.svg.setAttribute('viewBox', viewBox);
             (this.svg.querySelector('path') as Element).setAttribute('d', pathD);
             (this.svg.querySelector('rect') as Element).setAttribute('fill', qr.colors?.lightColor as string);
@@ -132,7 +135,7 @@ export class QrgenComponent implements AfterViewInit {
                 qr.border as number,
                 qr.colors?.lightColor as string,
                 qr.colors?.darkColor as string,
-                this.canvas);
+                this.canvas as HTMLCanvasElement);
         });
     }
 }
